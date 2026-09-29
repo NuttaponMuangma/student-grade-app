@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import urllib.parse
-from streamlit_gsheets import GSheetsConnection
 
 # --- ตั้งค่าหน้าเว็บสำหรับมือถือและคอมพิวเตอร์ ---
 st.set_page_config(
@@ -97,22 +96,43 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- ฟังก์ชันอ่านข้อมูลจาก Google Sheet ---
+# --- ฟังก์ชันอ่านข้อมูลจาก Google Sheet แบบปรับหาตำแหน่งหัวตารางอัตโนมัติ ---
 def load_sheet_data(sheet_name):
     try:
-        # อ่านไฟล์ CSV จาก Google Sheets gviz API
         encoded_sheet = urllib.parse.quote(sheet_name)
         url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={encoded_sheet}"
-        df = pd.read_csv(url)
         
-        # ปรับความสะอาดข้อมูล
-        df = df.dropna(how='all')
-        if 'ชื่อ - นามสกุล' in df.columns:
-            df = df.dropna(subset=['ชื่อ - นามสกุล'])
+        # อ่านไฟล์แบบยังไม่กำหนดแถวหัวตาราง
+        df_raw = pd.read_csv(url, header=None)
+        
+        # ค้นหาแถวที่มีคำว่า 'ชื่อ - นามสกุล'
+        header_idx = None
+        for idx, row in df_raw.iterrows():
+            if row.astype(str).str.contains('ชื่อ - นามสกุล|ชื่อ-นามสกุล|ชื่อนามสกุล').any():
+                header_idx = idx
+                break
+                
+        if header_idx is not None:
+            df = pd.read_csv(url, header=header_idx)
+            # ตัดช่องว่างเกินตรงชื่อคอลัมน์
+            df.columns = [str(c).strip() for c in df.columns]
             
-        # กรองคอลัมน์ Unnamed ออก
-        cols = [c for c in df.columns if not str(c).startswith('Unnamed') and not 'merged' in str(c)]
-        return df[cols]
+            # ค้นหาชื่อคอลัมน์นักเรียน
+            name_col = next((c for c in df.columns if 'ชื่อ' in c and 'นามสกุล' in c), None)
+            
+            if name_col:
+                # กรองลบแถวหัวตารางซ้ำและแถวว่าง
+                df = df[df[name_col].astype(str).str.strip() != name_col]
+                df = df.dropna(subset=[name_col])
+                df = df[df[name_col].astype(str).str.strip() != '']
+                
+                if name_col != 'ชื่อ - นามสกุล':
+                    df = df.rename(columns={name_col: 'ชื่อ - นามสกุล'})
+                    
+                cols = [c for c in df.columns if not str(c).startswith('Unnamed') and 'merged' not in str(c).lower()]
+                return df[cols]
+                
+        return pd.DataFrame()
     except Exception as e:
         st.error(f"ไม่สามารถโหลดข้อมูลแผ่นงาน {sheet_name} ได้: {e}")
         return pd.DataFrame()
@@ -143,7 +163,7 @@ def render_student_table_html(df):
         html += '<tr>'
         for col in df.columns:
             val = row[col]
-            is_missing = pd.isna(val) or val is None or str(val).strip() == '' or str(val).strip().lower() == 'nan'
+            is_missing = pd.isna(val) or val is None or str(val).strip() == '' or str(val).strip().lower() in ['nan', 'none']
             
             if col in non_score_cols:
                 if col == 'ชื่อ - นามสกุล':
@@ -188,7 +208,7 @@ all_data = load_all_data()
 if menu == "🔍 สำหรับนักเรียน (ค้นหาคะแนน)":
     st.markdown('<h2 class="sub-header">🔍 ค้นหาผลการเรียน</h2>', unsafe_allow_html=True)
     
-    search_name = st.text_input("พิมพ์ชื่อ หรือนามสกุล ของนักเรียน (เช่น พชร)", placeholder="กรอกชื่อเพื่อค้นหา...")
+    search_name = st.text_input("พิมพ์ชื่อ หรือนามสกุล ของนักเรียน (เช่น สมชาย หรือ พชร)", placeholder="กรอกชื่อเพื่อค้นหา...").strip()
     
     if search_name:
         found = False
@@ -196,7 +216,7 @@ if menu == "🔍 สำหรับนักเรียน (ค้นหาค�
         
         for sheet_name, df in all_data.items():
             if 'ชื่อ - นามสกุล' in df.columns:
-                student_data = df[df['ชื่อ - นามสกุล'].astype(str).str.contains(search_name, na=False)]
+                student_data = df[df['ชื่อ - นามสกุล'].astype(str).str.contains(search_name, na=False, case=False)]
                 if not student_data.empty:
                     found = True
                     with st.expander(f"📖 ระดับชั้น: {sheet_name}", expanded=True):
