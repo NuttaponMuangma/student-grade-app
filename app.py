@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import urllib.parse
 
 # --- ตั้งค่าหน้าเว็บสำหรับมือถือและคอมพิวเตอร์ ---
 st.set_page_config(
-    page_title="ระบบเช็คผลการเรียนออนไลน์", 
+    page_title="ระบบรายงานผลการเรียนออนไลน์", 
     page_icon="🎓", 
     layout="wide",
     initial_sidebar_state="expanded"
@@ -26,7 +27,7 @@ st.markdown("""
             border-left: 5px solid #3b82f6;
         }
         .main-header {
-            font-size: 2rem;
+            font-size: 2.2rem;
             color: #1e3a8a;
             font-weight: 700;
             text-align: center;
@@ -38,8 +39,20 @@ st.markdown("""
             padding-bottom: 8px;
             margin-bottom: 15px;
         }
+        .summary-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .summary-card h3 {
+            color: #f8fafc;
+            margin-bottom: 5px;
+        }
         
-        /* สไตล์ตารางนักเรียนรองรับการดูบนมือถือและคอม */
+        /* สไตล์ตารางนักเรียน */
         .student-table-container {
             width: 100%;
             overflow-x: auto;
@@ -96,16 +109,15 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- ฟังก์ชันอ่านข้อมูลจาก Google Sheet แบบปรับหาตำแหน่งหัวตารางอัตโนมัติ ---
+# --- ฟังก์ชันอ่านและคำนวณข้อมูล (GPA & ลำดับที่) ---
 def load_sheet_data(sheet_name):
     try:
         encoded_sheet = urllib.parse.quote(sheet_name)
         url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={encoded_sheet}"
         
-        # อ่านไฟล์แบบยังไม่กำหนดแถวหัวตาราง
         df_raw = pd.read_csv(url, header=None)
         
-        # ค้นหาแถวที่มีคำว่า 'ชื่อ - นามสกุล'
+        # หาตำแหน่งแถวที่เป็นหัวตาราง
         header_idx = None
         for idx, row in df_raw.iterrows():
             if row.astype(str).str.contains('ชื่อ - นามสกุล|ชื่อ-นามสกุล|ชื่อนามสกุล').any():
@@ -114,14 +126,11 @@ def load_sheet_data(sheet_name):
                 
         if header_idx is not None:
             df = pd.read_csv(url, header=header_idx)
-            # ตัดช่องว่างเกินตรงชื่อคอลัมน์
             df.columns = [str(c).strip() for c in df.columns]
             
-            # ค้นหาชื่อคอลัมน์นักเรียน
             name_col = next((c for c in df.columns if 'ชื่อ' in c and 'นามสกุล' in c), None)
             
             if name_col:
-                # กรองลบแถวหัวตารางซ้ำและแถวว่าง
                 df = df[df[name_col].astype(str).str.strip() != name_col]
                 df = df.dropna(subset=[name_col])
                 df = df[df[name_col].astype(str).str.strip() != '']
@@ -130,38 +139,67 @@ def load_sheet_data(sheet_name):
                     df = df.rename(columns={name_col: 'ชื่อ - นามสกุล'})
                     
                 cols = [c for c in df.columns if not str(c).startswith('Unnamed') and 'merged' not in str(c).lower()]
-                return df[cols]
+                df = df[cols]
                 
-        return pd.DataFrame()
+                # แยกคอลัมน์วิชาเรียน (ไม่รวม เลขที่ และ ชื่อ-นามสกุล)
+                non_subj_keywords = ['เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย', 'ลำดับที่', 'รวม', 'เฉลี่ย', 'ผลการเรียน']
+                subject_cols = [c for c in df.columns if c not in ['เลขที่', 'ชื่อ - นามสกุล'] and not any(kw == c for kw in non_subj_keywords)]
+                
+                # คำนวณเกรดเฉลี่ย (GPA)
+                def calc_gpa(row):
+                    grades = []
+                    for col in subject_cols:
+                        val = row[col]
+                        try:
+                            v_float = float(val)
+                            if not np.isnan(v_float):
+                                grades.append(v_float)
+                        except (ValueError, TypeError):
+                            pass
+                    return round(np.mean(grades), 2) if len(grades) > 0 else np.nan
+
+                df['เกรดเฉลี่ย'] = df.apply(calc_gpa, axis=1)
+                
+                # จัดลำดับที่ในห้องเรียน
+                df['ลำดับที่'] = df['เกรดเฉลี่ย'].rank(ascending=False, method='min').astype('Int64')
+                
+                return df, subject_cols
+                
+        return pd.DataFrame(), []
     except Exception as e:
         st.error(f"ไม่สามารถโหลดข้อมูลแผ่นงาน {sheet_name} ได้: {e}")
-        return pd.DataFrame()
+        return pd.DataFrame(), []
 
 def load_all_data():
     all_data = {}
+    all_subject_cols = {}
     for sheet in SHEET_NAMES:
-        df = load_sheet_data(sheet)
+        df, subjs = load_sheet_data(sheet)
         if not df.empty:
             all_data[sheet] = df
-    return all_data
+            all_subject_cols[sheet] = subjs
+    return all_data, all_subject_cols
 
-# --- สร้างตาราง HTML สไตล์พิเศษสำหรับนักเรียน ---
-def render_student_table_html(df):
+# --- ฟังก์ชันสร้างตาราง HTML สไตล์พิเศษสำหรับนักเรียน ---
+def render_student_table_html(df, subject_cols):
     html = '<div class="student-table-container"><table class="student-table"><thead><tr>'
-    normal_cols = ['เลขที่', 'ชื่อ - นามสกุล', 'ผลการเรียน', 'เฉลี่ย', 'เกรด']
+    normal_cols = ['เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย', 'ลำดับที่', 'ผลการเรียน']
     
-    for col in df.columns:
+    # แสดงคอลัมน์ข้อมูลหลัก และคอลัมน์วิชาเรียน
+    display_cols = [c for c in df.columns if c in normal_cols or c in subject_cols]
+    
+    for col in display_cols:
         if any(nc in str(col) for nc in normal_cols):
             html += f'<th style="height: auto; padding: 8px;">{col}</th>'
         else:
             html += f'<th class="rotate-header"><div>{col}</div></th>'
             
     html += '</tr></thead><tbody>'
-    non_score_cols = ['เลขที่', 'ชื่อ - นามสกุล']
+    non_score_cols = ['เลขที่', 'ชื่อ - นามสกุล', 'ลำดับที่']
     
     for _, row in df.iterrows():
         html += '<tr>'
-        for col in df.columns:
+        for col in display_cols:
             val = row[col]
             is_missing = pd.isna(val) or val is None or str(val).strip() == '' or str(val).strip().lower() in ['nan', 'none']
             
@@ -169,7 +207,7 @@ def render_student_table_html(df):
                 if col == 'ชื่อ - นามสกุล':
                     html += f'<td class="name-cell">{val if not is_missing else ""}</td>'
                 else:
-                    html += f'<td>{int(val) if not is_missing and isinstance(val, float) and val.is_integer() else val}</td>'
+                    html += f'<td>{int(val) if not is_missing and isinstance(val, float) and val.is_integer() else (val if not is_missing else "-")}</td>'
             else:
                 if is_missing:
                     html += '<td class="missing-cell">ยังไม่ส่ง</td>'
@@ -187,23 +225,23 @@ def render_student_table_html(df):
 # ==========================================
 # เริ่มต้นหน้าตา UI
 # ==========================================
-st.markdown('<div class="main-header">🎓 ระบบผลการเรียนออนไลน์</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🎓 ระบบรายงานผลการเรียนออนไลน์</div>', unsafe_allow_html=True)
 
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/3135/3135810.png", width=80)
     st.markdown("## 📍 เมนูหลัก")
     menu = st.radio("เลือกหน้าต่างการทำงาน:", [
         "🔍 สำหรับนักเรียน (ค้นหาคะแนน)", 
-        "📊 แดชบอร์ดภาพรวม", 
+        "📊 แดชบอร์ดสรุปภาพรวม", 
         "📝 สำหรับครู (จัดการคะแนน)"
     ])
     st.markdown("---")
     st.caption("📱 รองรับการใช้งานผ่านมือถือและคอมพิวเตอร์")
 
-all_data = load_all_data()
+all_data, all_subject_cols = load_all_data()
 
 # ==========================================
-# 1. หน้า สำหรับนักเรียน
+# 1. หน้า สำหรับนักเรียน (ค้นหาคะแนน)
 # ==========================================
 if menu == "🔍 สำหรับนักเรียน (ค้นหาคะแนน)":
     st.markdown('<h2 class="sub-header">🔍 ค้นหาผลการเรียน</h2>', unsafe_allow_html=True)
@@ -212,41 +250,106 @@ if menu == "🔍 สำหรับนักเรียน (ค้นหาค�
     
     if search_name:
         found = False
-        st.markdown(f"#### 📑 ผลการค้นหาสำหรับ: **{search_name}**")
         
         for sheet_name, df in all_data.items():
             if 'ชื่อ - นามสกุล' in df.columns:
                 student_data = df[df['ชื่อ - นามสกุล'].astype(str).str.contains(search_name, na=False, case=False)]
                 if not student_data.empty:
                     found = True
-                    with st.expander(f"📖 ระดับชั้น: {sheet_name}", expanded=True):
-                        st.markdown(render_student_table_html(student_data), unsafe_allow_html=True)
+                    subj_cols = all_subject_cols.get(sheet_name, [])
+                    total_students = len(df)
+                    
+                    for _, student in student_data.iterrows():
+                        st.markdown(f"""
+                        <div class="summary-card">
+                            <h3>👤 {student['ชื่อ - นามสกุล']} (ระดับชั้น {sheet_name})</h3>
+                            <p style="margin: 0; font-size: 1.1rem;">
+                                🏆 <b>เกรดเฉลี่ย (GPA):</b> <span style="font-size: 1.4rem; color: #fde047;"><b>{student['เกรดเฉลี่ย']:.2f}</b></span> &nbsp;|&nbsp; 
+                                📊 <b>อันดับที่ในห้องเรียน:</b> <span style="font-size: 1.3rem;"><b>{student['ลำดับที่']}</b></span> / {total_students} คน &nbsp;|&nbsp; 
+                                📚 <b>วิชาที่เรียน:</b> {len(subj_cols)} วิชา
+                            </p>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        with st.expander(f"📖 ดูรายละเอียดคะแนนรายวิชาของ {student['ชื่อ - นามสกุล']}", expanded=True):
+                            st.markdown(render_student_table_html(student_data, subj_cols), unsafe_allow_html=True)
                         
         if not found:
             st.warning("⚠️ ไม่พบรายชื่อนี้ในระบบ กรุณาตรวจสอบการสะกดคำอีกครั้ง")
 
 # ==========================================
-# 2. หน้า แดชบอร์ดภาพรวม
+# 2. หน้า แดชบอร์ดสรุปภาพรวม
 # ==========================================
-elif menu == "📊 แดชบอร์ดภาพรวม":
-    st.markdown('<h2 class="sub-header">📊 สรุปภาพรวมรายชั้นเรียน</h2>', unsafe_allow_html=True)
+elif menu == "📊 แดชบอร์ดสรุปภาพรวม":
+    st.markdown('<h2 class="sub-header">📊 แดชบอร์ดสรุปผลการเรียน</h2>', unsafe_allow_html=True)
     
-    total_students = sum(len(df) for df in all_data.values())
+    # --- ส่วนที่ 1: สรุป Top 5 เกรดเฉลี่ยสูงสุดของแต่ละชั้นเรียน ---
+    st.markdown("### 🏆 นักเรียนที่ได้เกรดเฉลี่ยสูงสุด 5 อันดับแรก (แต่ละชั้นเรียน)")
     
-    col1, col2 = st.columns(2)
-    col1.metric("📚 จำนวนระดับชั้น", f"{len(all_data)} ระดับชั้น")
-    col2.metric("🧑‍🎓 จำนวนนักเรียนรวม", f"{total_students} คน")
+    tabs = st.tabs([f"ระดับชั้น {sheet}" for sheet in SHEET_NAMES])
     
-    st.markdown("<br>", unsafe_allow_html=True)
-    selected_dash_sheet = st.selectbox("เลือกชั้นเรียนที่ต้องการดูรายละเอียด:", SHEET_NAMES)
+    for i, sheet in enumerate(SHEET_NAMES):
+        with tabs[i]:
+            if sheet in all_data:
+                df = all_data[sheet]
+                top5_df = df.sort_values('เกรดเฉลี่ย', ascending=False).head(5)
+                
+                display_top5 = top5_df[['ลำดับที่', 'เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย']].copy()
+                display_top5.columns = ['อันดับในห้อง', 'เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย (GPA)']
+                
+                st.dataframe(
+                    display_top5,
+                    use_container_width=True,
+                    hide_index=True,
+                    column_config={
+                        "เกรดเฉลี่ย (GPA)": st.column_config.ProgressColumn(
+                            "เกรดเฉลี่ย (GPA)",
+                            format="%.2f",
+                            min_value=0.0,
+                            max_value=4.0
+                        )
+                    }
+                )
+            else:
+                st.info("ไม่มีข้อมูลในชั้นเรียนนี้")
+                
+    st.markdown("---")
     
-    if selected_dash_sheet in all_data:
-        df = all_data[selected_dash_sheet]
-        st.markdown(f"### 📋 รายชื่อและคะแนนทั้งหมด ({selected_dash_sheet})")
-        st.markdown(render_student_table_html(df), unsafe_allow_html=True)
+    # --- ส่วนที่ 2: กราฟสรุปจำนวนเกรดของแต่ละวิชา ในแต่ละชั้น ---
+    st.markdown("### 📈 กราฟแสดงรายละเอียดจำนวนเกรดของแต่ละวิชา")
+    
+    selected_level = st.selectbox("📌 เลือกระดับชั้นเรียน:", SHEET_NAMES)
+    
+    if selected_level in all_data:
+        df_level = all_data[selected_level]
+        subj_cols = all_subject_cols.get(selected_level, [])
+        
+        # ตัวเลือกรายวิชา (รวมตัวเลือก "ทุกวิชารวมกัน")
+        selected_subject = st.selectbox("📚 เลือกวิชาที่ต้องการดูการแจกแจงเกรด:", ["ทุกวิชารวมกัน"] + subj_cols)
+        
+        # แปลงข้อมูลเป็นตารางคู่ (วิชา - เกรด)
+        melted = df_level.melt(id_vars=['ชื่อ - นามสกุล'], value_vars=subj_cols, var_name='วิชา', value_name='เกรด')
+        melted['เกรด'] = melted['เกรด'].apply(lambda x: 'ยังไม่ส่ง' if pd.isna(x) or str(x).strip() == '' or str(x).strip().lower() in ['nan', 'none'] else str(x))
+        
+        if selected_subject != "ทุกวิชารวมกัน":
+            filtered_melted = melted[melted['วิชา'] == selected_subject]
+        else:
+            filtered_melted = melted
+            
+        grade_counts = filtered_melted['เกรด'].value_counts().reset_index()
+        grade_counts.columns = ['ระดับเกรด', 'จำนวนนักเรียน (คน)']
+        
+        # แสดงกราฟแท่ง
+        st.markdown(f"#### 📊 จำนวนนักเรียนในแต่ละระดับเกรด ({selected_subject} - ชั้น {selected_level})")
+        st.bar_chart(grade_counts.set_index('ระดับเกรด'))
+        
+        # ตารางสรุปจำนวนเกรดแยกตามวิชา
+        with st.expander("📋 ดูตารางสรุปจำนวนเกรดแยกตามรายวิชาทั้งหมด"):
+            pivot_grade = melted.groupby(['วิชา', 'เกรด']).size().unstack(fill_value=0)
+            st.dataframe(pivot_grade, use_container_width=True)
 
 # ==========================================
-# 3. หน้า สำหรับครู
+# 3. หน้า สำหรับครู (จัดการคะแนน)
 # ==========================================
 elif menu == "📝 สำหรับครู (จัดการคะแนน)":
     st.markdown('<h2 class="sub-header">📝 ระบบจัดการคะแนน</h2>', unsafe_allow_html=True)
@@ -255,7 +358,7 @@ elif menu == "📝 สำหรับครู (จัดการคะแน�
     
     if password == "1234":
         st.success("🔓 ยืนยันตัวตนสำเร็จ")
-        st.info("💡 คุณครูสามารถเข้าไปแก้ไขคะแนนโดยตรงได้ที่ Google Sheets ลิงก์ด้านล่าง ระบบจะอัปเดตข้อมูลบนเว็บโดยอัตโนมัติทันที:")
+        st.info("💡 คุณครูสามารถเข้าไปแก้ไขคะแนนโดยตรงได้ที่ Google Sheets ลิงก์ด้านล่าง ระบบจะอัปเดตคำนวณเกรดเฉลี่ยบนเว็บโดยอัตโนมัติทันที:")
         st.markdown(f"👉 **[คลิกที่นี่เพื่อเปิด Google Sheet แก้ไขคะแนน]({GSHEET_URL})**")
         
         selected_sheet = st.selectbox("📌 เลือกดูตารางคะแนนล่าสุด", SHEET_NAMES)
