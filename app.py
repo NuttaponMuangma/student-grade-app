@@ -8,8 +8,8 @@ import streamlit as st
 st.set_page_config(
     page_title="ผลการเรียนออนไลน์ - โรงเรียนบ้านสันถนน",
     page_icon="🎓",
-    layout="centered",
-    initial_sidebar_state="collapsed",
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 SCHOOL_NAME = "โรงเรียนบ้านสันถนน"
@@ -55,7 +55,7 @@ def get_subject_info(subj_name):
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap');
-:root{--ink:#12222B;--teal:#0E5A64;--teal-d:#0A3F47;--mist:#EEF3F4;--line:#D8E2E4;--muted:#5E7480;--amber:#E7A33E;--paper:#FFFFFF;}
+:root{--ink:#141A3A;--teal:#2B3A9F;--teal-d:#1A2466;--mist:#EEF1FA;--line:#D5DBEE;--muted:#5B6488;--amber:#E7A33E;--paper:#FFFFFF;}
 html,body,[class*="css"],.stMarkdown,.stTextInput,.stTabs{font-family:'Sarabun','TH Sarabun New',Thonburi,sans-serif;}
 .stApp{background:var(--mist);color:var(--ink);}
 #MainMenu,footer,header[data-testid="stHeader"]{visibility:hidden;height:0;}
@@ -63,12 +63,30 @@ html,body,[class*="css"],.stMarkdown,.stTextInput,.stTabs{font-family:'Sarabun',
 .hero{background:linear-gradient(135deg,var(--teal-d),var(--teal));color:#fff;border-radius:20px;padding:26px 28px;margin-bottom:18px;}
 .hero h1{font-family:'Prompt',sans-serif;font-size:1.75rem;font-weight:600;margin:0 0 4px 0;color:#fff;padding:0;line-height:1.3;}
 .hero p{margin:0;font-size:1.05rem;opacity:.88;}
-.stTabs [data-baseweb="tab-list"]{gap:6px;background:transparent;border-bottom:none;}
-.stTabs [data-baseweb="tab"]{background:var(--paper);border-radius:999px;padding:8px 20px;height:auto;border:1px solid var(--line);font-size:1.05rem;font-weight:600;color:var(--muted);}
-.stTabs [aria-selected="true"]{background:var(--teal);color:#fff;border-color:var(--teal);}
-.stTabs [data-baseweb="tab-highlight"],.stTabs [data-baseweb="tab-border"]{display:none;}
+.stTabs [data-baseweb="tab-list"]{gap:4px;border-bottom:2px solid var(--line);}
+.stTabs [data-baseweb="tab"]{padding:8px 18px;height:auto;font-size:1.05rem;font-weight:600;color:var(--muted);}
+.stTabs [aria-selected="true"]{color:var(--teal);}
+.stTabs [data-baseweb="tab-highlight"]{background:var(--teal);height:3px;}
+section[data-testid="stSidebar"]{background:var(--teal-d);min-width:250px;}
+section[data-testid="stSidebar"] *{color:#fff;}
+.side-brand{font-family:'Prompt',sans-serif;font-weight:600;font-size:1.25rem;line-height:1.4;padding:6px 4px 2px 4px;}
+.side-sub{color:#AEB8EC !important;font-size:.95rem;padding:0 4px 14px 4px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:14px;}
+section[data-testid="stSidebar"] div[role="radiogroup"]{gap:6px;}
+section[data-testid="stSidebar"] div[role="radiogroup"] label{width:100%;padding:12px 14px;border-radius:10px;border-left:4px solid transparent;cursor:pointer;}
+section[data-testid="stSidebar"] div[role="radiogroup"] label>div:first-child{display:none;}
+section[data-testid="stSidebar"] div[role="radiogroup"] label p{font-size:1.1rem;font-weight:500;}
+section[data-testid="stSidebar"] div[role="radiogroup"] label:hover{background:rgba(255,255,255,.08);}
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked){background:rgba(255,255,255,.16);border-left-color:#8FA2FF;}
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p{font-weight:700;}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;}
+.rt{width:100%;border-collapse:collapse;font-size:1.05rem;}
+.rt th{background:var(--teal-d);color:#fff;font-weight:600;padding:10px 12px;text-align:center;white-space:nowrap;}
+.rt td{padding:9px 12px;border-top:1px solid var(--line);text-align:center;}
+.rt td.l{text-align:left;font-weight:600;}
+.rt tbody tr:nth-child(even){background:#F6F8FD;}
+.rt tfoot td{background:var(--mist);font-weight:700;border-top:2px solid var(--teal);}
 .stTextInput input{font-size:1.15rem;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:#fff;}
-.stTextInput input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,90,100,.15);}
+.stTextInput input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(43,58,159,.15);}
 .h2{font-family:'Prompt',sans-serif;font-size:1.35rem;font-weight:600;color:var(--teal-d);margin:26px 0 10px 0;}
 .hint{color:var(--muted);font-size:1rem;margin:0 0 12px 0;}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:16px;}
@@ -84,7 +102,7 @@ html,body,[class*="css"],.stMarkdown,.stTextInput,.stTabs{font-family:'Sarabun',
 .stat .v{font-family:'Prompt',sans-serif;font-size:1.8rem;font-weight:600;color:var(--teal-d);line-height:1.25;}
 .stat .v small{font-size:.95rem;font-weight:500;color:var(--muted);}
 .stat.main{background:var(--teal);}
-.stat.main .k{color:#CFE6E8;}
+.stat.main .k{color:#D3D9F5;}
 .stat.main .v{color:#fff;}
 .subj{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--mist);}
 .subj:last-of-type{border-bottom:none;}
@@ -107,7 +125,7 @@ html,body,[class*="css"],.stMarkdown,.stTextInput,.stTabs{font-family:'Sarabun',
 .top{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--mist);}
 .top:last-child{border-bottom:none;}
 .rk{width:38px;height:38px;border-radius:50%;background:var(--mist);display:flex;align-items:center;justify-content:center;font-family:'Prompt',sans-serif;font-weight:600;color:var(--teal-d);flex:none;}
-.rk.r1{background:#F4C542;color:#5A4200;}.rk.r2{background:#C9D3D8;color:#33454F;}.rk.r3{background:#E0A878;color:#5A3210;}
+.rk.r1{background:#F4C542;color:#5A4200;}.rk.r2{background:#C9D3D8;color:#33385A;}.rk.r3{background:#E0A878;color:#5A3210;}
 .top .nm{flex:1;font-weight:600;font-size:1.1rem;}
 .top .no{color:var(--muted);font-size:.92rem;font-weight:400;display:block;}
 .top .gp{font-family:'Prompt',sans-serif;font-weight:600;font-size:1.25rem;color:var(--teal-d);}
@@ -223,7 +241,7 @@ def render_report(row, sheet_name, subject_cols, total_students):
             extra += credit
         v = row[col]
         right = '<span class="wait">รอผล</span>' if is_missing(v) else f'<span class="chip {grade_class(v)}">{fmt_grade(v)}</span>'
-        rows += f'<div class="subj"><div class="nm"><b>{esc(col)}</b><span>วิชา{stype} | {credit:.1f} หน่วยกิต</span></div>{right}</div>'
+        rows += f'<tr><td>{len(rows.split("<tr>"))}</td><td class="l">{esc(col)}</td><td>{stype}</td><td>{credit:.1f}</td><td>{right}</td></tr>'
 
     return clean_html(f"""
 <div class="card">
@@ -238,8 +256,11 @@ def render_report(row, sheet_name, subject_cols, total_students):
 <div class="stat"><div class="k">อันดับในห้อง</div><div class="v">{rank} <small>/ {total_students}</small></div></div>
 <div class="stat"><div class="k">หน่วยกิตรวม</div><div class="v">{basic + extra:.1f}</div></div>
 </div>
-{rows}
-<div class="foot">หน่วยกิตวิชาพื้นฐาน {basic:.1f} &nbsp;|&nbsp; วิชาเพิ่มเติม {extra:.1f}</div>
+<div class="tbl-wrap"><table class="rt">
+<thead><tr><th>ลำดับ</th><th>ชื่อวิชา</th><th>ประเภท</th><th>หน่วยกิต</th><th>ผลการเรียน</th></tr></thead>
+<tbody>{rows}</tbody>
+<tfoot><tr><td colspan="3">รวมหน่วยกิต (พื้นฐาน {basic:.1f} + เพิ่มเติม {extra:.1f})</td><td>{basic + extra:.1f}</td><td>GPA {gpa}</td></tr></tfoot>
+</table></div>
 </div>""")
 
 
@@ -259,10 +280,12 @@ st.markdown(clean_html(f"""
 <p>{SCHOOL_NAME} | ภาคเรียนที่ {SEMESTER} ปีการศึกษา {ACADEMIC_YEAR}</p></div>"""), unsafe_allow_html=True)
 
 all_data, all_subject_cols = load_all_data()
-tab_student, tab_dash, tab_teacher = st.tabs(["ผลการเรียนของฉัน", "ภาพรวมโรงเรียน", "สำหรับครู"])
+with st.sidebar:
+    st.markdown(clean_html(f'<div class="side-brand">🎓 {SCHOOL_NAME}</div><div class="side-sub">ผลการเรียน {SEMESTER}/{ACADEMIC_YEAR}</div>'), unsafe_allow_html=True)
+    page = st.radio("เมนู", ["🔍  ค้นหาผลการเรียน", "📊  ภาพรวมโรงเรียน", "🔑  สำหรับครู"], label_visibility="collapsed")
 
 # ---- 1. นักเรียน
-with tab_student:
+if page.endswith("ค้นหาผลการเรียน"):
     st.markdown('<p class="hint">พิมพ์ชื่อหรือนามสกุลของนักเรียน อย่างน้อย 2 ตัวอักษร</p>', unsafe_allow_html=True)
     q = st.text_input("ค้นหาชื่อ", placeholder="เช่น สมชาย", label_visibility="collapsed").strip()
 
@@ -279,7 +302,7 @@ with tab_student:
             st.warning("ไม่พบรายชื่อนี้ ลองตรวจการสะกดหรือค้นด้วยนามสกุลแทน")
 
 # ---- 2. แดชบอร์ด
-with tab_dash:
+elif page.endswith("ภาพรวมโรงเรียน"):
     progress, tot_all, filled_all = {}, 0, 0
     for sheet, df in all_data.items():
         subjs = all_subject_cols[sheet]
@@ -329,7 +352,7 @@ with tab_dash:
         st.markdown(clean_html(f'<div class="card">{bars}</div>'), unsafe_allow_html=True)
 
 # ---- 3. ครู
-with tab_teacher:
+else:
     pw = st.text_input("รหัสผ่านสำหรับคุณครู", type="password")
     if pw and pw == TEACHER_PASSWORD:
         st.success("ยืนยันตัวตนสำเร็จ")
