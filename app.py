@@ -8,8 +8,8 @@ import streamlit as st
 st.set_page_config(
     page_title="ผลการเรียนออนไลน์ - โรงเรียนบ้านสันถนน",
     page_icon="🎓",
-    layout="wide",
-    initial_sidebar_state="expanded",
+    layout="centered",
+    initial_sidebar_state="collapsed",
 )
 
 SCHOOL_NAME = "โรงเรียนบ้านสันถนน"
@@ -63,21 +63,17 @@ html,body,[class*="css"],.stMarkdown,.stTextInput,.stTabs{font-family:'Sarabun',
 .hero{background:linear-gradient(135deg,var(--teal-d),var(--teal));color:#fff;border-radius:20px;padding:26px 28px;margin-bottom:18px;}
 .hero h1{font-family:'Prompt',sans-serif;font-size:1.75rem;font-weight:600;margin:0 0 4px 0;color:#fff;padding:0;line-height:1.3;}
 .hero p{margin:0;font-size:1.05rem;opacity:.88;}
-.stTabs [data-baseweb="tab-list"]{gap:4px;border-bottom:2px solid var(--line);}
-.stTabs [data-baseweb="tab"]{padding:8px 18px;height:auto;font-size:1.05rem;font-weight:600;color:var(--muted);}
-.stTabs [aria-selected="true"]{color:var(--teal);}
-.stTabs [data-baseweb="tab-highlight"]{background:var(--teal);height:3px;}
-section[data-testid="stSidebar"]{background:var(--teal-d);min-width:250px;}
-section[data-testid="stSidebar"] *{color:#fff;}
-.side-brand{font-family:'Prompt',sans-serif;font-weight:600;font-size:1.25rem;line-height:1.4;padding:6px 4px 2px 4px;}
-.side-sub{color:#AEB8EC !important;font-size:.95rem;padding:0 4px 14px 4px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:14px;}
-section[data-testid="stSidebar"] div[role="radiogroup"]{gap:6px;}
-section[data-testid="stSidebar"] div[role="radiogroup"] label{width:100%;padding:12px 14px;border-radius:10px;border-left:4px solid transparent;cursor:pointer;}
-section[data-testid="stSidebar"] div[role="radiogroup"] label>div:first-child{display:none;}
-section[data-testid="stSidebar"] div[role="radiogroup"] label p{font-size:1.1rem;font-weight:500;}
-section[data-testid="stSidebar"] div[role="radiogroup"] label:hover{background:rgba(255,255,255,.08);}
-section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked){background:rgba(255,255,255,.16);border-left-color:#8FA2FF;}
-section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) p{font-weight:700;}
+[data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"],[data-testid="collapsedControl"]{display:none;}
+.stTabs [data-baseweb="tab-list"]{gap:8px;background:transparent;border-bottom:none;flex-wrap:nowrap;}
+.stTabs [data-baseweb="tab"]{flex:1;justify-content:center;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:12px 10px;height:auto;font-size:1.1rem;font-weight:600;color:var(--teal);box-shadow:0 2px 0 var(--line);white-space:nowrap;}
+.stTabs [data-baseweb="tab"]:hover{border-color:var(--teal);}
+.stTabs [aria-selected="true"]{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 2px 0 var(--teal-d);}
+.stTabs [aria-selected="true"] p{color:#fff;}
+.stTabs [data-baseweb="tab-highlight"],.stTabs [data-baseweb="tab-border"]{display:none;}
+.stTabs .stTabs [data-baseweb="tab-list"]{gap:4px;border-bottom:2px solid var(--line);}
+.stTabs .stTabs [data-baseweb="tab"]{flex:none;background:transparent;border:none;border-radius:0;box-shadow:none;padding:8px 18px;color:var(--muted);}
+.stTabs .stTabs [aria-selected="true"]{background:transparent;color:var(--teal);box-shadow:inset 0 -3px 0 var(--teal);}
+.stTabs .stTabs [aria-selected="true"] p{color:var(--teal);}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;}
 .rt{width:100%;border-collapse:collapse;font-size:1.05rem;}
 .rt th{background:var(--teal-d);color:#fff;font-weight:600;padding:10px 12px;text-align:center;white-space:nowrap;}
@@ -133,7 +129,7 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)
 .avg .l{font-size:1.02rem;line-height:1.3;}
 .avg .n{text-align:right;font-family:'Prompt',sans-serif;font-weight:600;}
 .avg .bar i.g4{background:#1E8E5A;}.avg .bar i.g3{background:#2A7FB8;}.avg .bar i.g2{background:#C99A1B;}.avg .bar i.g1{background:#D9772B;}.avg .bar i.g0{background:#C8453A;}.avg .bar i.gx{background:#8A9BA5;}
-@media (max-width:600px){.hero{padding:20px;}.hero h1{font-size:1.4rem;}.stats,.kpis{grid-template-columns:1fr 1fr 1fr;gap:8px;}.stat .v,.kpi .v{font-size:1.4rem;}.avg{grid-template-columns:1fr 46px;}.avg .bar{grid-column:1 / 3;grid-row:2;}.card{padding:16px;}}
+@media (max-width:600px){.block-container{padding:.8rem .6rem 2.5rem .6rem;}.stTabs [data-baseweb="tab"]{padding:10px 4px;font-size:1rem;}.rt{font-size:.95rem;}.rt th,.rt td{padding:8px 6px;}.rc-name{font-size:1.35rem;}.top .nm{font-size:1rem;}.stTextInput input{font-size:1.05rem;}.hero{padding:20px;}.hero h1{font-size:1.4rem;}.stats,.kpis{grid-template-columns:1fr 1fr 1fr;gap:8px;}.stat .v,.kpi .v{font-size:1.4rem;}.avg{grid-template-columns:1fr 46px;}.avg .bar{grid-column:1 / 3;grid-row:2;}.card{padding:16px;}}
 </style>
 """
 st.markdown(clean_html(CSS), unsafe_allow_html=True)
@@ -280,12 +276,9 @@ st.markdown(clean_html(f"""
 <p>{SCHOOL_NAME} | ภาคเรียนที่ {SEMESTER} ปีการศึกษา {ACADEMIC_YEAR}</p></div>"""), unsafe_allow_html=True)
 
 all_data, all_subject_cols = load_all_data()
-with st.sidebar:
-    st.markdown(clean_html(f'<div class="side-brand">🎓 {SCHOOL_NAME}</div><div class="side-sub">ผลการเรียน {SEMESTER}/{ACADEMIC_YEAR}</div>'), unsafe_allow_html=True)
-    page = st.radio("เมนู", ["🔍  ค้นหาผลการเรียน", "📊  ภาพรวมโรงเรียน", "🔑  สำหรับครู"], label_visibility="collapsed")
-
+tab_student, tab_dash, tab_teacher = st.tabs(["🔍 ผลการเรียน", "📊 ภาพรวม", "🔑 ครู"])
 # ---- 1. นักเรียน
-if page.endswith("ค้นหาผลการเรียน"):
+with tab_student:
     st.markdown('<p class="hint">พิมพ์ชื่อหรือนามสกุลของนักเรียน อย่างน้อย 2 ตัวอักษร</p>', unsafe_allow_html=True)
     q = st.text_input("ค้นหาชื่อ", placeholder="เช่น สมชาย", label_visibility="collapsed").strip()
 
@@ -302,7 +295,7 @@ if page.endswith("ค้นหาผลการเรียน"):
             st.warning("ไม่พบรายชื่อนี้ ลองตรวจการสะกดหรือค้นด้วยนามสกุลแทน")
 
 # ---- 2. แดชบอร์ด
-elif page.endswith("ภาพรวมโรงเรียน"):
+with tab_dash:
     progress, tot_all, filled_all = {}, 0, 0
     for sheet, df in all_data.items():
         subjs = all_subject_cols[sheet]
@@ -352,7 +345,7 @@ elif page.endswith("ภาพรวมโรงเรียน"):
         st.markdown(clean_html(f'<div class="card">{bars}</div>'), unsafe_allow_html=True)
 
 # ---- 3. ครู
-else:
+with tab_teacher:
     pw = st.text_input("รหัสผ่านสำหรับคุณครู", type="password")
     if pw and pw == TEACHER_PASSWORD:
         st.success("ยืนยันตัวตนสำเร็จ")
