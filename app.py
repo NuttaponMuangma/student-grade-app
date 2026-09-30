@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import urllib.parse
+import textwrap
 
 # --- ตั้งค่าหน้าเว็บสำหรับมือถือและคอมพิวเตอร์ ---
 st.set_page_config(
@@ -14,7 +15,7 @@ st.set_page_config(
 # --- ข้อมูลโรงเรียนสำหรับแบบฟอร์ม ปพ.6 ---
 SCHOOL_NAME = "โรงเรียนบ้านสันถนน"
 SCHOOL_DISTRICT = "สำนักงานเขตพื้นที่การศึกษาประถมศึกษาเชียงราย เขต 3 จังหวัดเชียงราย"
-ACADEMIC_YEAR = "2568"
+ACADEMIC_YEAR = "2569"
 SEMESTER = "1"
 
 # --- ลิงก์ Google Sheet ---
@@ -24,7 +25,6 @@ SHEET_NAMES = ["ม.1", "ม.2", "ม.3"]
 
 # --- ฟังก์ชันกำหนดประเภทและหน่วยกิตของแต่ละวิชา ---
 def get_subject_info(subj_name):
-    # กำหนดหน่วยกิตและประเภทวิชา (พื้นฐาน/เพิ่มเติม)
     info = {
         'ภาษาไทย': (1.5, 'พื้นฐาน'),
         'คณิตศาสตร์': (1.5, 'พื้นฐาน'),
@@ -47,7 +47,7 @@ def get_subject_info(subj_name):
     for key, val in info.items():
         if key in subj_name:
             return val
-    return (1.0, 'พื้นฐาน') # ค่าเริ่มต้นหากไม่พบรายชื่อวิชา
+    return (1.0, 'พื้นฐาน')
 
 # --- Custom CSS แต่งสไตล์เว็บ และกระดาษ ปพ.6 ---
 st.markdown("""
@@ -57,28 +57,39 @@ st.markdown("""
         
         /* สไตล์หน้ากระดาษ ปพ.6 */
         .pp6-paper {
-            background-color: white;
-            color: black;
-            padding: 40px;
-            border-radius: 4px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            font-family: 'Sarabun', 'TH Sarabun New', Tahoma, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 35px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            font-family: 'Sarabun', 'TH Sarabun New', Thonburi, sans-serif;
             margin: 0 auto;
-            max-width: 800px;
+            max-width: 820px;
+            border: 1px solid #cbd5e1;
         }
-        .pp6-header { text-align: center; margin-bottom: 20px; }
-        .pp6-header h3, .pp6-header h4 { margin: 5px 0; color: black; font-weight: bold; }
-        .pp6-header p { margin: 2px 0; font-size: 16px; color: black; }
-        .pp6-info { margin-bottom: 15px; font-size: 16px; color: black; }
+        .pp6-header { text-align: center; margin-bottom: 25px; }
+        .pp6-header h3 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 22px; }
+        .pp6-header h4 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 18px; }
+        .pp6-header p { margin: 3px 0; font-size: 15px; color: #333333; }
         
-        .pp6-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 16px; }
-        .pp6-table th, .pp6-table td { border: 1px solid black !important; padding: 6px 10px !important; color: black !important; }
-        .pp6-table th { background-color: #f8f9fa !important; text-align: center; font-weight: bold; }
+        .pp6-info { 
+            margin-bottom: 20px; 
+            font-size: 16px; 
+            color: #000000; 
+            background-color: #f8fafc;
+            padding: 12px 18px;
+            border-radius: 6px;
+            border-left: 4px solid #2563eb;
+        }
         
-        .pp6-summary table { width: 70%; border-collapse: collapse; font-size: 16px; margin-top: 10px; }
-        .pp6-summary td { padding: 4px; color: black !important; }
+        .pp6-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 15px; }
+        .pp6-table th, .pp6-table td { border: 1px solid #333333 !important; padding: 8px 10px !important; color: #000000 !important; }
+        .pp6-table th { background-color: #f1f5f9 !important; text-align: center; font-weight: bold; }
         
-        .pp6-signatures { display: flex; justify-content: space-between; text-align: center; font-size: 16px; margin-top: 60px; color: black; }
+        .pp6-summary { margin-top: 15px; }
+        .pp6-summary table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        .pp6-summary td { border: 1px solid #333333 !important; padding: 8px 12px !important; color: #000000 !important; }
+        .pp6-summary td.bg-light { background-color: #f8fafc !important; font-weight: bold; }
         
         /* สไตล์ตาราง Dashboard */
         .dash-table-container { width: 100%; overflow-x: auto; margin-top: 10px; margin-bottom: 20px; }
@@ -126,7 +137,6 @@ def load_sheet_data(sheet_name):
                 non_subj_keywords = ['เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย', 'ลำดับที่', 'รวม', 'เฉลี่ย', 'ผลการเรียน']
                 subject_cols = [c for c in df.columns if c not in ['เลขที่', 'ชื่อ - นามสกุล'] and not any(kw == c for kw in non_subj_keywords)]
                 
-                # คำนวณเกรดเฉลี่ยถ่วงน้ำหนัก (Weighted GPA)
                 def calc_gpa(row):
                     total_points = 0
                     total_credits = 0
@@ -187,81 +197,73 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
         else:
             grade_str = f"{val:.1f}".rstrip('0').rstrip('.') if isinstance(val, float) and val % 1 != 0 else str(int(val)) if isinstance(val, float) else str(val)
             
-        tbody_html += f'''
+        tbody_html += f"""
         <tr>
             <td style="text-align: center;">{i}</td>
             <td style="text-align: left;">{col}</td>
             <td style="text-align: center;">{subj_type}</td>
             <td style="text-align: center;">{credit:.1f}</td>
             <td style="text-align: center;">{grade_str}</td>
-        </tr>
-        '''
+        </tr>"""
         
     total_cr = total_basic_cr + total_add_cr
 
-    html = f'''
-    <div class="pp6-paper">
-        <div class="pp6-header">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Emblem_of_the_Ministry_of_Education_of_Thailand.svg/200px-Emblem_of_the_Ministry_of_Education_of_Thailand.svg.png" width="60" style="margin-bottom:10px; opacity:0.8;">
-            <h3>แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
-            <p>ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
-            <h4>{SCHOOL_NAME}</h4>
-            <p>{SCHOOL_DISTRICT}</p>
-        </div>
-        
-        <div class="pp6-info">
-            <b>เลขที่:</b> {student_no} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชื่อ - นามสกุล:</b> {student_name} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชั้น:</b> {sheet_name}
-        </div>
-        
-        <table class="pp6-table">
-            <thead>
-                <tr>
-                    <th width="8%">ลำดับ</th>
-                    <th width="42%">ชื่อวิชา</th>
-                    <th width="20%">ประเภท</th>
-                    <th width="15%">จำนวน<br>หน่วยกิต</th>
-                    <th width="15%">ระดับ<br>ผลการเรียน</th>
-                </tr>
-            </thead>
-            <tbody>
-                {tbody_html}
-            </tbody>
-        </table>
-        
-        <div class="pp6-summary">
-            <b>สรุปผลการประเมิน</b>
-            <table>
-                <tr>
-                    <td>จำนวนหน่วยกิต/น้ำหนักวิชาพื้นฐาน</td>
-                    <td>{total_basic_cr:.1f}</td>
-                </tr>
-                <tr>
-                    <td>จำนวนหน่วยกิต/น้ำหนักวิชาเพิ่มเติม</td>
-                    <td>{total_add_cr:.1f}</td>
-                </tr>
-                <tr>
-                    <td><b>รวมจำนวนหน่วยกิต/น้ำหนัก</b></td>
-                    <td><b>{total_cr:.1f}</b></td>
-                </tr>
-                <tr>
-                    <td><b>ระดับผลการเรียนเฉลี่ย (GPA)</b></td>
-                    <td><b>{gpa}</b></td>
-                </tr>
-                <tr>
-                    <td><b>อันดับที่ในห้องเรียน</b></td>
-                    <td><b>{rank} จากนักเรียนจำนวน {total_students} คน</b></td>
-                </tr>
-            </table>
-        </div>
-        
-        <div class="pp6-signatures">
-            <div>ลงชื่อ................................................<br><br>ครูที่ปรึกษา</div>
-            <div>ลงชื่อ................................................<br><br>ผู้บริหารสถานศึกษา</div>
-            <div>ลงชื่อ................................................<br><br>ผู้ปกครอง</div>
-        </div>
+    raw_html = f"""
+<div class="pp6-paper">
+    <div class="pp6-header">
+        <h3>แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
+        <p>ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
+        <h4>{SCHOOL_NAME}</h4>
+        <p>{SCHOOL_DISTRICT}</p>
     </div>
-    '''
-    return html
+    
+    <div class="pp6-info">
+        <b>เลขที่:</b> {student_no} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชื่อ - นามสกุล:</b> {student_name} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชั้น:</b> {sheet_name}
+    </div>
+    
+    <table class="pp6-table">
+        <thead>
+            <tr>
+                <th width="8%">ลำดับ</th>
+                <th width="42%">ชื่อวิชา</th>
+                <th width="20%">ประเภท</th>
+                <th width="15%">จำนวน<br>หน่วยกิต</th>
+                <th width="15%">ระดับ<br>ผลการเรียน</th>
+            </tr>
+        </thead>
+        <tbody>
+            {tbody_html}
+        </tbody>
+    </table>
+    
+    <div class="pp6-summary">
+        <b style="font-size: 16px;">สรุปผลการประเมิน</b>
+        <table style="margin-top: 8px;">
+            <tr>
+                <td width="60%">จำนวนหน่วยกิต/น้ำหนักวิชาพื้นฐาน</td>
+                <td width="40%"><b>{total_basic_cr:.2f}</b></td>
+            </tr>
+            <tr>
+                <td>จำนวนหน่วยกิต/น้ำหนักวิชาเพิ่มเติม</td>
+                <td><b>{total_add_cr:.2f}</b></td>
+            </tr>
+            <tr>
+                <td class="bg-light">รวมจำนวนหน่วยกิต/น้ำหนัก</td>
+                <td class="bg-light"><b>{total_cr:.2f}</b></td>
+            </tr>
+            <tr>
+                <td class="bg-light">ระดับผลการเรียนเฉลี่ย (GPA)</td>
+                <td class="bg-light"><b style="color: #1e3a8a; font-size: 18px;">{gpa}</b></td>
+            </tr>
+            <tr>
+                <td class="bg-light">อันดับที่ในห้องเรียน</td>
+                <td class="bg-light"><b>{rank}</b> (จากนักเรียนจำนวน {total_students} คน)</td>
+            </tr>
+        </table>
+    </div>
+</div>
+"""
+    return textwrap.dedent(raw_html).strip()
 
 # --- สร้างตาราง Dashboard ---
 def render_dashboard_table(df, subject_cols):
@@ -293,7 +295,7 @@ def render_dashboard_table(df, subject_cols):
                     html += f'<td>{f"{val:.2f}".rstrip("0").rstrip(".") if isinstance(val, float) and val % 1 != 0 else (int(val) if isinstance(val, float) else val)}</td>'
         html += '</tr>'
     html += '</tbody></table></div>'
-    return html
+    return textwrap.dedent(html).strip()
 
 # ==========================================
 # เริ่มต้นหน้าตา UI
