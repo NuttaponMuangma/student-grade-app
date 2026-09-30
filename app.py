@@ -53,7 +53,7 @@ def get_subject_info(subj_name):
             return cr, stype
     return 1.0, 'พื้นฐาน'
 
-# --- Custom CSS แต่งสไตล์ Bootstrap 5 บีบช่องตารางให้กระชับ คงตัวหนังสือใหญ่ ---
+# --- Custom CSS และ Bootstrap 5 Styling (ปรับปรุงส่วนหัวให้สวยงาม กระชับ) ---
 st.markdown(clean_html("""
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
@@ -88,7 +88,7 @@ st.markdown(clean_html("""
         .pp6-paper {
             background-color: #ffffff;
             color: #212529;
-            padding: 30px 40px;
+            padding: 35px 45px;
             border-radius: 16px;
             box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
             margin: 0 auto 30px auto;
@@ -96,16 +96,40 @@ st.markdown(clean_html("""
             border: 1px solid #dee2e6;
         }
         
-        .pp6-header h3 { font-size: 32px !important; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
-        .pp6-header h4 { font-size: 26px !important; font-weight: bold; color: #0d6efd; margin-bottom: 4px; }
-        .pp6-header p { font-size: 22px !important; color: #475569; margin-bottom: 2px; }
+        /* สไตล์ส่วนหัวที่ปรับปรุงใหม่ (ชิดสวยงาม ไม่ห่าง) */
+        .pp6-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px double #cbd5e1;
+        }
+        .pp6-header h3 { 
+            font-size: 30px !important; 
+            font-weight: bold; 
+            color: #0f172a; 
+            margin: 0 0 2px 0 !important; 
+            line-height: 1.25 !important;
+        }
+        .pp6-header h4 { 
+            font-size: 26px !important; 
+            font-weight: bold; 
+            color: #0d6efd; 
+            margin: 2px 0 2px 0 !important; 
+            line-height: 1.25 !important;
+        }
+        .pp6-header p { 
+            font-size: 22px !important; 
+            color: #475569; 
+            margin: 1px 0 1px 0 !important; 
+            line-height: 1.25 !important;
+        }
         
         .pp6-info-box {
-            background-color: #f8fafc;
+            background-color: #f0f7ff;
             border-left: 6px solid #0d6efd;
             border-radius: 10px;
             padding: 10px 20px;
-            font-size: 25px !important;
+            font-size: 24px !important;
             margin-bottom: 18px;
         }
         
@@ -114,7 +138,6 @@ st.markdown(clean_html("""
             margin-bottom: 18px;
         }
         
-        /* บีบขนาดความสูงช่องตาราง (Padding) ให้เล็กลง */
         .pp6-table th {
             background-color: #e2e8f0 !important;
             color: #0f172a !important;
@@ -122,13 +145,13 @@ st.markdown(clean_html("""
             font-weight: bold !important;
             text-align: center;
             vertical-align: middle;
-            padding: 4px 8px !important;
+            padding: 5px 8px !important;
         }
         
         .pp6-table td {
             vertical-align: middle;
             color: #1e293b !important;
-            padding: 4px 8px !important;
+            padding: 5px 8px !important;
             font-size: 24px !important;
         }
         
@@ -147,7 +170,7 @@ st.markdown(clean_html("""
         }
         
         .pp6-summary-table td {
-            padding: 4px 10px !important;
+            padding: 5px 10px !important;
             border-bottom: 1px solid #e2e8f0;
             font-size: 24px !important;
         }
@@ -235,7 +258,7 @@ def load_all_data():
             all_subject_cols[sheet] = subjs
     return all_data, all_subject_cols
 
-# --- สร้างหน้ากระดาษ ปพ.6 สไตล์ Bootstrap 5 ช่องตารางกระชับ ---
+# --- สร้างหน้ากระดาษ ปพ.6 สไตล์กระชับ สวยงาม ---
 def render_porpor6(row, sheet_name, subject_cols, total_students):
     student_no = int(row['เลขที่']) if pd.notna(row['เลขที่']) else "-"
     student_name = row['ชื่อ - นามสกุล']
@@ -276,11 +299,11 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
 
     raw_html = f"""
 <div class="pp6-paper shadow-lg border rounded-4 p-4 my-3 bg-white">
-    <div class="text-center mb-3 pp6-header">
-        <h3 class="fw-bold text-dark mb-1">แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
-        <p class="text-secondary mb-1">ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
-        <h4 class="fw-bold text-primary mb-1">{SCHOOL_NAME}</h4>
-        <p class="text-muted mb-0">{SCHOOL_DISTRICT}</p>
+    <div class="pp6-header">
+        <h3>แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
+        <p>ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
+        <h4>{SCHOOL_NAME}</h4>
+        <p>{SCHOOL_DISTRICT}</p>
     </div>
     
     <div class="pp6-info-box alert alert-primary border-0 border-start border-5 border-primary rounded-3 p-2 px-3 mb-3">
