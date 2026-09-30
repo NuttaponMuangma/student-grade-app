@@ -5,7 +5,7 @@ import urllib.parse
 
 # --- ตั้งค่าหน้าเว็บสำหรับมือถือและคอมพิวเตอร์ ---
 st.set_page_config(
-    page_title="ระบบรายงานผลการเรียนออนไลน์", 
+    page_title="ระบบรายงานผลการเรียนออนไลน์ - โรงเรียนบ้านสันถนน", 
     page_icon="🎓", 
     layout="wide",
     initial_sidebar_state="expanded"
@@ -28,86 +28,134 @@ def clean_html(html_str):
 
 # --- ฟังก์ชันกำหนดประเภทและหน่วยกิตของแต่ละวิชา ---
 def get_subject_info(subj_name):
-    info = {
-        'ภาษาไทย': (1.5, 'พื้นฐาน'),
-        'คณิตศาสตร์': (1.5, 'พื้นฐาน'),
-        'วิทยาศาสตร์': (1.5, 'พื้นฐาน'),
-        'วิทยาการ': (1.0, 'พื้นฐาน'),
-        'สังคม': (1.5, 'พื้นฐาน'),
-        'ประวัติ': (0.5, 'พื้นฐาน'),
-        'อังกฤษ': (1.5, 'พื้นฐาน'),
-        'สุข': (1.0, 'พื้นฐาน'),
-        'พละ': (1.0, 'พื้นฐาน'),
-        'ทัศนศิลป์': (1.0, 'พื้นฐาน'),
-        'ดนตรี': (1.0, 'พื้นฐาน'),
-        'การงาน': (1.0, 'พื้นฐาน'),
-        'ออกแบบ': (1.0, 'เพิ่มเติม'),
-        'คณิตเพิ่ม': (1.0, 'เพิ่มเติม'),
-        'อังกฤษเพิ่ม': (1.0, 'เพิ่มเติม'),
-        'ทักษะอาชีพ': (0.5, 'เพิ่มเติม'),
-        'ต้านทุจริต': (0.5, 'เพิ่มเติม')
-    }
-    for key, val in info.items():
+    # เรียงลำดับคำค้นหาที่ยาวและเฉพาะเจาะจงขึ้นก่อนเสมอ
+    info_map = [
+        ('อังกฤษเพิ่ม', 1.0, 'เพิ่มเติม'),
+        ('คณิตเพิ่ม', 1.0, 'เพิ่มเติม'),
+        ('ภาษาไทย', 1.5, 'พื้นฐาน'),
+        ('คณิตศาสตร์', 1.5, 'พื้นฐาน'),
+        ('วิทยาศาสตร์', 1.5, 'พื้นฐาน'),
+        ('วิทยาการ', 1.0, 'พื้นฐาน'),
+        ('ประวัติ', 0.5, 'พื้นฐาน'),
+        ('สังคม', 1.5, 'พื้นฐาน'),
+        ('อังกฤษ', 1.5, 'พื้นฐาน'),
+        ('สุขพละ', 1.0, 'พื้นฐาน'),
+        ('สุข', 1.0, 'พื้นฐาน'),
+        ('พละ', 1.0, 'พื้นฐาน'),
+        ('ทัศนศิลป์', 1.0, 'พื้นฐาน'),
+        ('ดนตรี', 1.0, 'พื้นฐาน'),
+        ('การงาน', 1.0, 'พื้นฐาน'),
+        ('ออกแบบ', 1.0, 'เพิ่มเติม'),
+        ('ทักษะอาชีพ', 0.5, 'เพิ่มเติม'),
+        ('ต้านทุจริต', 0.5, 'เพิ่มเติม'),
+    ]
+    for key, cr, stype in info_map:
         if key in subj_name:
-            return val
-    return (1.0, 'พื้นฐาน')
+            return cr, stype
+    return 1.0, 'พื้นฐาน'
 
-# --- Custom CSS แต่งสไตล์เว็บ และกำหนดฟอนต์ TH Sarabun PSK ---
+# --- Custom CSS และ Bootstrap 5 Styling ---
 st.markdown(clean_html("""
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
         
-        html, body, [class*="css"], div, p, span, h1, h2, h3, h4, h5, h6, table, td, th, input, button, select {
+        * {
             font-family: 'TH Sarabun PSK', 'TH Sarabun New', 'Sarabun', Thonburi, sans-serif !important;
         }
         
-        .main-header { font-size: 2.6rem; color: #1e3a8a; font-weight: 700; text-align: center; margin-bottom: 20px; }
-        .sub-header { color: #2563eb; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; font-size: 2rem; }
+        body {
+            background-color: #f8fafc;
+        }
         
-        /* สไตล์หน้ากระดาษ ปพ.6 */
+        .main-header { 
+            font-size: 32px !important; 
+            color: #0d6efd; 
+            font-weight: 700; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .sub-header { 
+            color: #0d6efd; 
+            border-bottom: 3px solid #0d6efd; 
+            padding-bottom: 8px; 
+            margin-bottom: 20px; 
+            font-size: 26px !important; 
+            font-weight: bold;
+        }
+        
+        /* สไตล์หน้ากระดาษ ปพ.6 แบบ Bootstrap 5 Card */
         .pp6-paper {
             background-color: #ffffff;
-            color: #000000;
-            padding: 40px 50px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+            color: #212529;
+            padding: 40px 45px;
+            border-radius: 16px;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
             margin: 0 auto 30px auto;
-            max-width: 850px;
-            border: 1px solid #cbd5e1;
+            max-width: 900px;
+            border: 1px solid #dee2e6;
         }
-        .pp6-header { text-align: center; margin-bottom: 25px; }
-        .pp6-header h3 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 26px; }
-        .pp6-header h4 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 22px; }
-        .pp6-header p { margin: 3px 0; font-size: 18px; color: #222222; }
         
-        .pp6-info { 
-            margin-bottom: 20px; 
-            font-size: 19px; 
-            color: #000000; 
+        .pp6-header h3 { font-size: 28px !important; font-weight: bold; color: #0f172a; margin-bottom: 6px; }
+        .pp6-header h4 { font-size: 24px !important; font-weight: bold; color: #0d6efd; margin-bottom: 6px; }
+        .pp6-header p { font-size: 20px !important; color: #475569; margin-bottom: 4px; }
+        
+        .pp6-info-box {
             background-color: #f8fafc;
-            padding: 12px 18px;
-            border-radius: 6px;
-            border-left: 5px solid #2563eb;
+            border-left: 5px solid #0d6efd;
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 22px !important;
+            margin-bottom: 25px;
         }
         
-        .pp6-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 18px; }
-        .pp6-table th, .pp6-table td { border: 1px solid #000000 !important; padding: 6px 10px !important; color: #000000 !important; }
-        .pp6-table th { background-color: #f1f5f9 !important; text-align: center; font-weight: bold; }
+        .pp6-table {
+            font-size: 20px !important;
+            margin-bottom: 25px;
+        }
         
-        .pp6-summary { margin-top: 15px; }
-        .pp6-summary table { width: 100%; border-collapse: collapse; font-size: 18px; }
-        .pp6-summary td { border: 1px solid #000000 !important; padding: 6px 12px !important; color: #000000 !important; }
-        .pp6-summary td.bg-light { background-color: #f8fafc !important; font-weight: bold; }
+        .pp6-table th {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+            font-size: 21px !important;
+            font-weight: bold !important;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .pp6-table td {
+            vertical-align: middle;
+            color: #1e293b !important;
+        }
+        
+        .pp6-summary-box {
+            background-color: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        
+        .pp6-summary-table {
+            font-size: 21px !important;
+            width: 100%;
+            margin-bottom: 0;
+        }
+        
+        .pp6-summary-table td {
+            padding: 10px 15px !important;
+            border-bottom: 1px solid #e2e8f0;
+        }
         
         /* สไตล์ตาราง Dashboard */
         .dash-table-container { width: 100%; overflow-x: auto; margin-top: 10px; margin-bottom: 20px; }
-        .dash-table { width: 100%; border-collapse: collapse; font-size: 16px; }
-        .dash-table th { border: 1px solid #cbd5e1; background-color: #f1f5f9; padding: 6px 2px; text-align: center; font-weight: 600; }
-        .dash-table th.rotate-header { height: 110px; white-space: nowrap; }
+        .dash-table { width: 100%; border-collapse: collapse; font-size: 19px !important; }
+        .dash-table th { border: 1px solid #cbd5e1; background-color: #f1f5f9; padding: 8px 4px; text-align: center; font-weight: 600; }
+        .dash-table th.rotate-header { height: 120px; white-space: nowrap; }
         .dash-table th.rotate-header > div { writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 auto; }
-        .dash-table td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; }
-        .dash-table td.missing-cell { background-color: #fef08a !important; color: #854d0e; font-weight: bold; font-size: 15px; }
-        .dash-table td.name-cell { text-align: left; white-space: nowrap; font-weight: 600; padding-left: 8px; }
+        .dash-table td { border: 1px solid #cbd5e1; padding: 8px 6px; text-align: center; }
+        .dash-table td.missing-cell { background-color: #fef08a !important; color: #854d0e; font-weight: bold; font-size: 18px !important; }
+        .dash-table td.name-cell { text-align: left; white-space: nowrap; font-weight: 600; padding-left: 10px; }
     </style>
 """), unsafe_allow_html=True)
 
@@ -179,7 +227,7 @@ def load_all_data():
             all_subject_cols[sheet] = subjs
     return all_data, all_subject_cols
 
-# --- สร้างหน้ากระดาษ ปพ.6 ---
+# --- สร้างหน้ากระดาษ ปพ.6 สไตล์ Bootstrap 5 ---
 def render_porpor6(row, sheet_name, subject_cols, total_students):
     student_no = int(row['เลขที่']) if pd.notna(row['เลขที่']) else "-"
     student_name = row['ชื่อ - นามสกุล']
@@ -200,74 +248,86 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
             
         val = row[col]
         is_missing = pd.isna(val) or val is None or str(val).strip() == '' or str(val).strip().lower() in ['nan', 'none']
+        
         if is_missing:
-            grade_str = 'ยังไม่ส่ง'
+            grade_str = '<span class="badge bg-warning text-dark fs-6 px-3 py-1">ยังไม่ส่ง</span>'
         else:
-            grade_str = f"{val:.1f}".rstrip('0').rstrip('.') if isinstance(val, float) and val % 1 != 0 else str(int(val)) if isinstance(val, float) else str(val)
+            g_num = f"{val:.1f}".rstrip('0').rstrip('.') if isinstance(val, float) and val % 1 != 0 else str(int(val)) if isinstance(val, float) else str(val)
+            grade_str = f'<span class="fw-bold fs-5">{g_num}</span>'
             
         tbody_html += f"""
         <tr>
-            <td style="text-align: center;">{i}</td>
-            <td style="text-align: left;">{col}</td>
-            <td style="text-align: center;">{subj_type}</td>
-            <td style="text-align: center;">{credit:.1f}</td>
-            <td style="text-align: center;">{grade_str}</td>
+            <td class="text-center">{i}</td>
+            <td class="text-start ps-3">{col}</td>
+            <td class="text-center">{subj_type}</td>
+            <td class="text-center">{credit:.1f}</td>
+            <td class="text-center">{grade_str}</td>
         </tr>"""
         
     total_cr = total_basic_cr + total_add_cr
 
     raw_html = f"""
-<div class="pp6-paper">
-    <div class="pp6-header">
-        <h3>แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
-        <p>ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
-        <h4>{SCHOOL_NAME}</h4>
-        <p>{SCHOOL_DISTRICT}</p>
+<div class="pp6-paper shadow-lg border rounded-4 p-4 p-md-5 my-4 bg-white">
+    <div class="text-center mb-4 pp6-header">
+        <h3 class="fw-bold text-dark mb-1">แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
+        <p class="text-secondary mb-1">ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
+        <h4 class="fw-bold text-primary mb-1">{SCHOOL_NAME}</h4>
+        <p class="text-muted mb-0">{SCHOOL_DISTRICT}</p>
     </div>
     
-    <div class="pp6-info">
-        <b>เลขที่:</b> {student_no} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชื่อ - นามสกุล:</b> {student_name} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชั้น:</b> {sheet_name}
+    <div class="pp6-info-box alert alert-primary border-0 border-start border-4 border-primary rounded-3 p-3 mb-4">
+        <div class="row text-dark">
+            <div class="col-md-3"><b>เลขที่:</b> {student_no}</div>
+            <div class="col-md-6"><b>ชื่อ - นามสกุล:</b> {student_name}</div>
+            <div class="col-md-3"><b>ชั้น:</b> {sheet_name}</div>
+        </div>
     </div>
     
-    <table class="pp6-table">
-        <thead>
-            <tr>
-                <th width="8%">ลำดับ</th>
-                <th width="42%">ชื่อวิชา</th>
-                <th width="20%">ประเภท</th>
-                <th width="15%">จำนวน<br>หน่วยกิต</th>
-                <th width="15%">ระดับ<br>ผลการเรียน</th>
-            </tr>
-        </thead>
-        <tbody>
-            {tbody_html}
-        </tbody>
-    </table>
-    
-    <div class="pp6-summary">
-        <b style="font-size: 19px;">สรุปผลการประเมิน</b>
-        <table style="margin-top: 8px;">
-            <tr>
-                <td width="65%">จำนวนหน่วยกิต/น้ำหนักวิชาพื้นฐาน</td>
-                <td width="35%"><b>{total_basic_cr:.2f}</b></td>
-            </tr>
-            <tr>
-                <td>จำนวนหน่วยกิต/น้ำหนักวิชาเพิ่มเติม</td>
-                <td><b>{total_add_cr:.2f}</b></td>
-            </tr>
-            <tr>
-                <td class="bg-light">รวมจำนวนหน่วยกิต/น้ำหนัก</td>
-                <td class="bg-light"><b>{total_cr:.2f}</b></td>
-            </tr>
-            <tr>
-                <td class="bg-light">ระดับผลการเรียนเฉลี่ย (GPA)</td>
-                <td class="bg-light"><b style="color: #1e3a8a; font-size: 20px;">{gpa}</b></td>
-            </tr>
-            <tr>
-                <td class="bg-light">อันดับที่ในห้องเรียน</td>
-                <td class="bg-light"><b>{rank}</b> (จากนักเรียนจำนวน {total_students} คน)</td>
-            </tr>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-striped table-hover align-middle pp6-table">
+            <thead class="table-light">
+                <tr>
+                    <th width="8%" class="text-center">ลำดับ</th>
+                    <th width="42%" class="text-center">ชื่อวิชา</th>
+                    <th width="20%" class="text-center">ประเภท</th>
+                    <th width="15%" class="text-center">จำนวนหน่วยกิต</th>
+                    <th width="15%" class="text-center">ระดับผลการเรียน</th>
+                </tr>
+            </thead>
+            <tbody>
+                {tbody_html}
+            </tbody>
         </table>
+    </div>
+    
+    <div class="pp6-summary-box card border border-secondary-subtle rounded-3 p-3">
+        <h5 class="card-title fw-bold text-dark mb-3" style="font-size: 22px;">📌 สรุปผลการประเมิน</h5>
+        <div class="table-responsive">
+            <table class="table table-borderless align-middle pp6-summary-table mb-0">
+                <tbody>
+                    <tr>
+                        <td width="65%" class="text-secondary">จำนวนหน่วยกิต/น้ำหนักวิชาพื้นฐาน</td>
+                        <td width="35%" class="fw-bold text-dark">{total_basic_cr:.2f}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-secondary">จำนวนหน่วยกิต/น้ำหนักวิชาเพิ่มเติม</td>
+                        <td class="fw-bold text-dark">{total_add_cr:.2f}</td>
+                    </tr>
+                    <tr class="table-light">
+                        <td class="fw-bold text-dark">รวมจำนวนหน่วยกิต/น้ำหนัก</td>
+                        <td class="fw-bold text-dark">{total_cr:.2f}</td>
+                    </tr>
+                    <tr class="table-primary">
+                        <td class="fw-bold text-primary">ระดับผลการเรียนเฉลี่ย (GPA)</td>
+                        <td><span class="badge bg-primary text-white fs-5 px-3 py-2">{gpa}</span></td>
+                    </tr>
+                    <tr class="table-light">
+                        <td class="fw-bold text-dark">อันดับที่ในห้องเรียน</td>
+                        <td class="fw-bold text-dark">{rank} <span class="text-muted fw-normal">(จากนักเรียนจำนวน {total_students} คน)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 """
@@ -341,7 +401,7 @@ if menu == "🔍 สำหรับนักเรียน (ค้นหาค�
                     
                     for _, student in student_data.iterrows():
                         st.markdown(render_porpor6(student, sheet_name, subj_cols, total_students), unsafe_allow_html=True)
-                        st.markdown("<br><hr><br>", unsafe_allow_html=True)
+                        st.markdown("<br>", unsafe_allow_html=True)
                         
         if not found:
             st.warning("⚠️ ไม่พบรายชื่อนี้ในระบบ กรุณาตรวจสอบการสะกดคำอีกครั้ง")
