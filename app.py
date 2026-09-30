@@ -53,7 +53,7 @@ def get_subject_info(subj_name):
             return cr, stype
     return 1.0, 'พื้นฐาน'
 
-# --- Custom CSS แต่งสไตล์ Bootstrap 5 และขยายขนาดฟอนต์ใหญ่พิเศษ ---
+# --- Custom CSS แต่งสไตล์ Bootstrap 5 บีบช่องตารางให้กระชับ คงตัวหนังสือใหญ่ ---
 st.markdown(clean_html("""
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
@@ -69,18 +69,18 @@ st.markdown(clean_html("""
         }
         
         .main-header { 
-            font-size: 38px !important; 
+            font-size: 36px !important; 
             color: #0d6efd; 
             font-weight: 700; 
             text-align: center; 
-            margin-bottom: 25px; 
+            margin-bottom: 20px; 
         }
         .sub-header { 
             color: #0d6efd; 
             border-bottom: 3px solid #0d6efd; 
-            padding-bottom: 8px; 
-            margin-bottom: 25px; 
-            font-size: 30px !important; 
+            padding-bottom: 6px; 
+            margin-bottom: 20px; 
+            font-size: 28px !important; 
             font-weight: bold;
         }
         
@@ -88,7 +88,7 @@ st.markdown(clean_html("""
         .pp6-paper {
             background-color: #ffffff;
             color: #212529;
-            padding: 45px 50px;
+            padding: 30px 40px;
             border-radius: 16px;
             box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
             margin: 0 auto 30px auto;
@@ -96,74 +96,74 @@ st.markdown(clean_html("""
             border: 1px solid #dee2e6;
         }
         
-        .pp6-header h3 { font-size: 34px !important; font-weight: bold; color: #0f172a; margin-bottom: 8px; }
-        .pp6-header h4 { font-size: 28px !important; font-weight: bold; color: #0d6efd; margin-bottom: 8px; }
-        .pp6-header p { font-size: 24px !important; color: #475569; margin-bottom: 4px; }
+        .pp6-header h3 { font-size: 32px !important; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
+        .pp6-header h4 { font-size: 26px !important; font-weight: bold; color: #0d6efd; margin-bottom: 4px; }
+        .pp6-header p { font-size: 22px !important; color: #475569; margin-bottom: 2px; }
         
         .pp6-info-box {
             background-color: #f8fafc;
             border-left: 6px solid #0d6efd;
             border-radius: 10px;
-            padding: 18px 24px;
-            font-size: 26px !important;
-            margin-bottom: 30px;
+            padding: 10px 20px;
+            font-size: 25px !important;
+            margin-bottom: 18px;
         }
         
         .pp6-table {
-            font-size: 25px !important;
-            margin-bottom: 30px;
+            font-size: 24px !important;
+            margin-bottom: 18px;
         }
         
+        /* บีบขนาดความสูงช่องตาราง (Padding) ให้เล็กลง */
         .pp6-table th {
             background-color: #e2e8f0 !important;
             color: #0f172a !important;
-            font-size: 26px !important;
+            font-size: 25px !important;
             font-weight: bold !important;
             text-align: center;
             vertical-align: middle;
-            padding: 12px 10px !important;
+            padding: 4px 8px !important;
         }
         
         .pp6-table td {
             vertical-align: middle;
             color: #1e293b !important;
-            padding: 12px 14px !important;
-            font-size: 25px !important;
+            padding: 4px 8px !important;
+            font-size: 24px !important;
         }
         
         .pp6-summary-box {
             background-color: #ffffff;
             border: 2px solid #cbd5e1;
             border-radius: 12px;
-            padding: 24px;
-            margin-top: 20px;
+            padding: 16px 20px;
+            margin-top: 10px;
         }
         
         .pp6-summary-table {
-            font-size: 25px !important;
+            font-size: 24px !important;
             width: 100%;
             margin-bottom: 0;
         }
         
         .pp6-summary-table td {
-            padding: 12px 18px !important;
+            padding: 4px 10px !important;
             border-bottom: 1px solid #e2e8f0;
-            font-size: 25px !important;
+            font-size: 24px !important;
         }
         
         /* สไตล์ตาราง Dashboard */
         .dash-table-container { width: 100%; overflow-x: auto; margin-top: 10px; margin-bottom: 20px; }
-        .dash-table { width: 100%; border-collapse: collapse; font-size: 24px !important; }
-        .dash-table th { border: 1px solid #cbd5e1; background-color: #f1f5f9; padding: 10px 6px; text-align: center; font-weight: 600; font-size: 24px !important; }
-        .dash-table th.rotate-header { height: 130px; white-space: nowrap; }
+        .dash-table { width: 100%; border-collapse: collapse; font-size: 22px !important; }
+        .dash-table th { border: 1px solid #cbd5e1; background-color: #f1f5f9; padding: 6px 4px; text-align: center; font-weight: 600; font-size: 23px !important; }
+        .dash-table th.rotate-header { height: 120px; white-space: nowrap; }
         .dash-table th.rotate-header > div { writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 auto; }
-        .dash-table td { border: 1px solid #cbd5e1; padding: 10px 8px; text-align: center; font-size: 24px !important; }
-        .dash-table td.missing-cell { background-color: #fef08a !important; color: #854d0e; font-weight: bold; font-size: 22px !important; }
-        .dash-table td.name-cell { text-align: left; white-space: nowrap; font-weight: 600; padding-left: 12px; }
+        .dash-table td { border: 1px solid #cbd5e1; padding: 5px 6px; text-align: center; font-size: 22px !important; }
+        .dash-table td.missing-cell { background-color: #fef08a !important; color: #854d0e; font-weight: bold; font-size: 20px !important; }
+        .dash-table td.name-cell { text-align: left; white-space: nowrap; font-weight: 600; padding-left: 10px; }
         
-        /* ขยายฟอนต์ปุ่มและอินพุต */
-        .stTextInput input { font-size: 24px !important; padding: 10px 14px !important; }
-        .stSelectbox div { font-size: 24px !important; }
+        .stTextInput input { font-size: 22px !important; padding: 8px 12px !important; }
+        .stSelectbox div { font-size: 22px !important; }
     </style>
 """), unsafe_allow_html=True)
 
@@ -235,7 +235,7 @@ def load_all_data():
             all_subject_cols[sheet] = subjs
     return all_data, all_subject_cols
 
-# --- สร้างหน้ากระดาษ ปพ.6 สไตล์ Bootstrap 5 ตัวหนังสือใหญ่พิเศษ ---
+# --- สร้างหน้ากระดาษ ปพ.6 สไตล์ Bootstrap 5 ช่องตารางกระชับ ---
 def render_porpor6(row, sheet_name, subject_cols, total_students):
     student_no = int(row['เลขที่']) if pd.notna(row['เลขที่']) else "-"
     student_name = row['ชื่อ - นามสกุล']
@@ -258,10 +258,10 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
         is_missing = pd.isna(val) or val is None or str(val).strip() == '' or str(val).strip().lower() in ['nan', 'none']
         
         if is_missing:
-            grade_str = '<span class="badge bg-warning text-dark px-3 py-2" style="font-size: 20px !important;">ยังไม่ส่ง</span>'
+            grade_str = '<span class="badge bg-warning text-dark px-2 py-1" style="font-size: 18px !important;">ยังไม่ส่ง</span>'
         else:
             g_num = f"{val:.1f}".rstrip('0').rstrip('.') if isinstance(val, float) and val % 1 != 0 else str(int(val)) if isinstance(val, float) else str(val)
-            grade_str = f'<span class="fw-bold" style="font-size: 25px !important;">{g_num}</span>'
+            grade_str = f'<span class="fw-bold" style="font-size: 24px !important;">{g_num}</span>'
             
         tbody_html += f"""
         <tr>
@@ -275,15 +275,15 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
     total_cr = total_basic_cr + total_add_cr
 
     raw_html = f"""
-<div class="pp6-paper shadow-lg border rounded-4 p-4 p-md-5 my-4 bg-white">
-    <div class="text-center mb-4 pp6-header">
+<div class="pp6-paper shadow-lg border rounded-4 p-4 my-3 bg-white">
+    <div class="text-center mb-3 pp6-header">
         <h3 class="fw-bold text-dark mb-1">แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
         <p class="text-secondary mb-1">ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
         <h4 class="fw-bold text-primary mb-1">{SCHOOL_NAME}</h4>
         <p class="text-muted mb-0">{SCHOOL_DISTRICT}</p>
     </div>
     
-    <div class="pp6-info-box alert alert-primary border-0 border-start border-5 border-primary rounded-3 p-3 mb-4">
+    <div class="pp6-info-box alert alert-primary border-0 border-start border-5 border-primary rounded-3 p-2 px-3 mb-3">
         <div class="row text-dark">
             <div class="col-md-3"><b>เลขที่:</b> {student_no}</div>
             <div class="col-md-6"><b>ชื่อ - นามสกุล:</b> {student_name}</div>
@@ -291,7 +291,7 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
         </div>
     </div>
     
-    <div class="table-responsive mb-4">
+    <div class="table-responsive mb-3">
         <table class="table table-bordered table-striped table-hover align-middle pp6-table">
             <thead class="table-light">
                 <tr>
@@ -308,8 +308,8 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
         </table>
     </div>
     
-    <div class="pp6-summary-box card border border-secondary-subtle rounded-3 p-4">
-        <h5 class="card-title fw-bold text-dark mb-3" style="font-size: 26px !important;">📌 สรุปผลการประเมิน</h5>
+    <div class="pp6-summary-box card border border-secondary-subtle rounded-3 p-3">
+        <h5 class="card-title fw-bold text-dark mb-2" style="font-size: 24px !important;">📌 สรุปผลการประเมิน</h5>
         <div class="table-responsive">
             <table class="table table-borderless align-middle pp6-summary-table mb-0">
                 <tbody>
@@ -327,7 +327,7 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
                     </tr>
                     <tr class="table-primary">
                         <td class="fw-bold text-primary">ระดับผลการเรียนเฉลี่ย (GPA)</td>
-                        <td><span class="badge bg-primary text-white px-3 py-2" style="font-size: 26px !important;">{gpa}</span></td>
+                        <td><span class="badge bg-primary text-white px-3 py-1" style="font-size: 24px !important;">{gpa}</span></td>
                     </tr>
                     <tr class="table-light">
                         <td class="fw-bold text-dark">อันดับที่ในห้องเรียน</td>
@@ -349,7 +349,7 @@ def render_dashboard_table(df, subject_cols):
     
     for col in display_cols:
         if any(nc in str(col) for nc in normal_cols):
-            html += f'<th style="height: auto; padding: 10px 8px;">{col}</th>'
+            html += f'<th style="height: auto; padding: 6px 6px;">{col}</th>'
         else:
             html += f'<th class="rotate-header"><div>{col}</div></th>'
             
