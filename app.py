@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import urllib.parse
-import textwrap
 
 # --- ตั้งค่าหน้าเว็บสำหรับมือถือและคอมพิวเตอร์ ---
 st.set_page_config(
@@ -22,6 +21,10 @@ SEMESTER = "1"
 GSHEET_URL = "https://docs.google.com/spreadsheets/d/1FXRBsGcqjpDjKjzmArhz8SAnKd2sE-gl_zT9NhfzOPM/edit?usp=sharing"
 SHEET_ID = "1FXRBsGcqjpDjKjzmArhz8SAnKd2sE-gl_zT9NhfzOPM"
 SHEET_NAMES = ["ม.1", "ม.2", "ม.3"]
+
+# ฟังก์ชันลบช่องว่างส่วนเกินเพื่อป้องกันไม่ให้ Streamlit แปลง HTML เป็น Code Block
+def clean_html(html_str):
+    return "".join([line.strip() for line in html_str.split('\n')])
 
 # --- ฟังก์ชันกำหนดประเภทและหน่วยกิตของแต่ละวิชา ---
 def get_subject_info(subj_name):
@@ -49,59 +52,64 @@ def get_subject_info(subj_name):
             return val
     return (1.0, 'พื้นฐาน')
 
-# --- Custom CSS แต่งสไตล์เว็บ และกระดาษ ปพ.6 ---
-st.markdown("""
+# --- Custom CSS แต่งสไตล์เว็บ และกำหนดฟอนต์ TH Sarabun PSK ---
+st.markdown(clean_html("""
     <style>
-        .main-header { font-size: 2.2rem; color: #1e3a8a; font-weight: 700; text-align: center; margin-bottom: 20px; }
-        .sub-header { color: #2563eb; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; }
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+        
+        html, body, [class*="css"], div, p, span, h1, h2, h3, h4, h5, h6, table, td, th, input, button, select {
+            font-family: 'TH Sarabun PSK', 'TH Sarabun New', 'Sarabun', Thonburi, sans-serif !important;
+        }
+        
+        .main-header { font-size: 2.6rem; color: #1e3a8a; font-weight: 700; text-align: center; margin-bottom: 20px; }
+        .sub-header { color: #2563eb; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; font-size: 2rem; }
         
         /* สไตล์หน้ากระดาษ ปพ.6 */
         .pp6-paper {
             background-color: #ffffff;
             color: #000000;
-            padding: 35px 40px;
+            padding: 40px 50px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            font-family: 'Sarabun', 'TH Sarabun New', Thonburi, sans-serif;
-            margin: 0 auto;
-            max-width: 820px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+            margin: 0 auto 30px auto;
+            max-width: 850px;
             border: 1px solid #cbd5e1;
         }
         .pp6-header { text-align: center; margin-bottom: 25px; }
-        .pp6-header h3 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 22px; }
-        .pp6-header h4 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 18px; }
-        .pp6-header p { margin: 3px 0; font-size: 15px; color: #333333; }
+        .pp6-header h3 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 26px; }
+        .pp6-header h4 { margin: 5px 0; color: #000000; font-weight: bold; font-size: 22px; }
+        .pp6-header p { margin: 3px 0; font-size: 18px; color: #222222; }
         
         .pp6-info { 
             margin-bottom: 20px; 
-            font-size: 16px; 
+            font-size: 19px; 
             color: #000000; 
             background-color: #f8fafc;
             padding: 12px 18px;
             border-radius: 6px;
-            border-left: 4px solid #2563eb;
+            border-left: 5px solid #2563eb;
         }
         
-        .pp6-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 15px; }
-        .pp6-table th, .pp6-table td { border: 1px solid #333333 !important; padding: 8px 10px !important; color: #000000 !important; }
+        .pp6-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 18px; }
+        .pp6-table th, .pp6-table td { border: 1px solid #000000 !important; padding: 6px 10px !important; color: #000000 !important; }
         .pp6-table th { background-color: #f1f5f9 !important; text-align: center; font-weight: bold; }
         
         .pp6-summary { margin-top: 15px; }
-        .pp6-summary table { width: 100%; border-collapse: collapse; font-size: 15px; }
-        .pp6-summary td { border: 1px solid #333333 !important; padding: 8px 12px !important; color: #000000 !important; }
+        .pp6-summary table { width: 100%; border-collapse: collapse; font-size: 18px; }
+        .pp6-summary td { border: 1px solid #000000 !important; padding: 6px 12px !important; color: #000000 !important; }
         .pp6-summary td.bg-light { background-color: #f8fafc !important; font-weight: bold; }
         
         /* สไตล์ตาราง Dashboard */
         .dash-table-container { width: 100%; overflow-x: auto; margin-top: 10px; margin-bottom: 20px; }
-        .dash-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .dash-table { width: 100%; border-collapse: collapse; font-size: 16px; }
         .dash-table th { border: 1px solid #cbd5e1; background-color: #f1f5f9; padding: 6px 2px; text-align: center; font-weight: 600; }
         .dash-table th.rotate-header { height: 110px; white-space: nowrap; }
         .dash-table th.rotate-header > div { writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 auto; }
         .dash-table td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; }
-        .dash-table td.missing-cell { background-color: #fef08a !important; color: #854d0e; font-weight: bold; font-size: 11px; }
+        .dash-table td.missing-cell { background-color: #fef08a !important; color: #854d0e; font-weight: bold; font-size: 15px; }
         .dash-table td.name-cell { text-align: left; white-space: nowrap; font-weight: 600; padding-left: 8px; }
     </style>
-""", unsafe_allow_html=True)
+"""), unsafe_allow_html=True)
 
 # --- ฟังก์ชันอ่านและคำนวณข้อมูล ---
 def load_sheet_data(sheet_name):
@@ -237,11 +245,11 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
     </table>
     
     <div class="pp6-summary">
-        <b style="font-size: 16px;">สรุปผลการประเมิน</b>
+        <b style="font-size: 19px;">สรุปผลการประเมิน</b>
         <table style="margin-top: 8px;">
             <tr>
-                <td width="60%">จำนวนหน่วยกิต/น้ำหนักวิชาพื้นฐาน</td>
-                <td width="40%"><b>{total_basic_cr:.2f}</b></td>
+                <td width="65%">จำนวนหน่วยกิต/น้ำหนักวิชาพื้นฐาน</td>
+                <td width="35%"><b>{total_basic_cr:.2f}</b></td>
             </tr>
             <tr>
                 <td>จำนวนหน่วยกิต/น้ำหนักวิชาเพิ่มเติม</td>
@@ -253,7 +261,7 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
             </tr>
             <tr>
                 <td class="bg-light">ระดับผลการเรียนเฉลี่ย (GPA)</td>
-                <td class="bg-light"><b style="color: #1e3a8a; font-size: 18px;">{gpa}</b></td>
+                <td class="bg-light"><b style="color: #1e3a8a; font-size: 20px;">{gpa}</b></td>
             </tr>
             <tr>
                 <td class="bg-light">อันดับที่ในห้องเรียน</td>
@@ -263,7 +271,7 @@ def render_porpor6(row, sheet_name, subject_cols, total_students):
     </div>
 </div>
 """
-    return textwrap.dedent(raw_html).strip()
+    return clean_html(raw_html)
 
 # --- สร้างตาราง Dashboard ---
 def render_dashboard_table(df, subject_cols):
@@ -295,12 +303,12 @@ def render_dashboard_table(df, subject_cols):
                     html += f'<td>{f"{val:.2f}".rstrip("0").rstrip(".") if isinstance(val, float) and val % 1 != 0 else (int(val) if isinstance(val, float) else val)}</td>'
         html += '</tr>'
     html += '</tbody></table></div>'
-    return textwrap.dedent(html).strip()
+    return clean_html(html)
 
 # ==========================================
 # เริ่มต้นหน้าตา UI
 # ==========================================
-st.markdown('<div class="main-header">🎓 ระบบรายงานผลการเรียนออนไลน์</div>', unsafe_allow_html=True)
+st.markdown(clean_html('<div class="main-header">🎓 ระบบรายงานผลการเรียนออนไลน์</div>'), unsafe_allow_html=True)
 
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/3135/3135810.png", width=80)
@@ -317,7 +325,7 @@ all_data, all_subject_cols = load_all_data()
 # 1. หน้า สำหรับนักเรียน (รูปแบบ ปพ.6)
 # ==========================================
 if menu == "🔍 สำหรับนักเรียน (ค้นหาคะแนน)":
-    st.markdown('<h2 class="sub-header">🔍 ค้นหาผลการเรียน</h2>', unsafe_allow_html=True)
+    st.markdown(clean_html('<h2 class="sub-header">🔍 ค้นหาผลการเรียน</h2>'), unsafe_allow_html=True)
     
     search_name = st.text_input("พิมพ์ชื่อ หรือนามสกุล ของนักเรียน (เช่น สมชาย)", placeholder="กรอกชื่อเพื่อค้นหา...").strip()
     
@@ -342,7 +350,7 @@ if menu == "🔍 สำหรับนักเรียน (ค้นหาค�
 # 2. หน้า แดชบอร์ดภาพรวม
 # ==========================================
 elif menu == "📊 แดชบอร์ดสรุปภาพรวม":
-    st.markdown('<h2 class="sub-header">📊 แดชบอร์ดสรุปผลการเรียน</h2>', unsafe_allow_html=True)
+    st.markdown(clean_html('<h2 class="sub-header">📊 แดชบอร์ดสรุปผลการเรียน</h2>'), unsafe_allow_html=True)
     
     st.markdown("### 🏆 นักเรียนที่ได้เกรดเฉลี่ยสูงสุด 5 อันดับแรก")
     tabs = st.tabs([f"ระดับชั้น {sheet}" for sheet in SHEET_NAMES])
@@ -367,7 +375,7 @@ elif menu == "📊 แดชบอร์ดสรุปภาพรวม":
 # 3. หน้า สำหรับครู
 # ==========================================
 elif menu == "📝 สำหรับครู (จัดการคะแนน)":
-    st.markdown('<h2 class="sub-header">📝 ระบบจัดการคะแนน</h2>', unsafe_allow_html=True)
+    st.markdown(clean_html('<h2 class="sub-header">📝 ระบบจัดการคะแนน</h2>'), unsafe_allow_html=True)
     password = st.text_input("🔑 รหัสผ่านสำหรับคุณครู", type="password")
     
     if password == "1234":
