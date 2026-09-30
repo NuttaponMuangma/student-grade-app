@@ -74,6 +74,23 @@ html,body,[class*="css"],.stMarkdown,.stTextInput,.stTabs{font-family:'Sarabun',
 .stTabs .stTabs [data-baseweb="tab"]{flex:none;background:transparent;border:none;border-radius:0;box-shadow:none;padding:8px 18px;color:var(--muted);}
 .stTabs .stTabs [aria-selected="true"]{background:transparent;color:var(--teal);box-shadow:inset 0 -3px 0 var(--teal);}
 .stTabs .stTabs [aria-selected="true"] p{color:var(--teal);}
+html body .stApp{color:var(--ink);color-scheme:light;}
+.stApp .stTextInput input,.stApp [data-baseweb="input"] input{color:var(--ink) !important;-webkit-text-fill-color:var(--ink) !important;background:#fff !important;}
+.stApp .stTextInput input::placeholder{color:#8A93B8 !important;-webkit-text-fill-color:#8A93B8 !important;opacity:1;}
+.stApp [data-baseweb="input"],.stApp [data-baseweb="base-input"]{background:#fff !important;border-radius:12px;}
+.stApp [data-baseweb="select"]>div{background:#fff !important;color:var(--ink) !important;}
+.stApp [data-testid="stWidgetLabel"] p,.stApp [data-testid="stWidgetLabel"] label{color:var(--ink) !important;}
+.stApp .stTabs button[data-baseweb="tab"]{flex:1 1 0 !important;background:#fff !important;border:1.5px solid var(--line) !important;border-radius:12px !important;}
+.stApp .stTabs button[data-baseweb="tab"] p{color:var(--teal) !important;font-weight:600;}
+.stApp .stTabs button[data-baseweb="tab"][aria-selected="true"]{background:var(--teal) !important;border-color:var(--teal) !important;}
+.stApp .stTabs button[data-baseweb="tab"][aria-selected="true"] p{color:#fff !important;}
+.stApp .stTabs [data-baseweb="tab-highlight"],.stApp .stTabs [data-baseweb="tab-border"]{display:none !important;}
+.stApp .stTabs .stTabs button[data-baseweb="tab"]{flex:none !important;background:transparent !important;border:none !important;border-radius:0 !important;}
+.stApp .stTabs .stTabs button[data-baseweb="tab"] p{color:var(--muted) !important;}
+.stApp .stTabs .stTabs button[data-baseweb="tab"][aria-selected="true"]{background:transparent !important;box-shadow:inset 0 -3px 0 var(--teal);}
+.stApp .stTabs .stTabs button[data-baseweb="tab"][aria-selected="true"] p{color:var(--teal) !important;}
+.hero *{color:#fff !important;}
+.hero-top{font-size:1.05rem;font-weight:600;opacity:.92;margin-bottom:8px !important;line-height:1.5;}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;}
 .rt{width:100%;border-collapse:collapse;font-size:1.05rem;}
 .rt th{background:var(--teal-d);color:#fff;font-weight:600;padding:10px 12px;text-align:center;white-space:nowrap;}
@@ -272,7 +289,7 @@ def render_top5(df):
 
 # ---------------------------------------------------------------- หน้าเว็บ
 st.markdown(clean_html(f"""
-<div class="hero"><h1>ผลการเรียนออนไลน์</h1>
+<div class="hero"><p class="hero-top">ระบบประกาศผลการเรียน ระดับชั้นมัธยมศึกษาตอนต้น โรงเรียนบ้านสันถนน</p><h1>ผลการเรียนออนไลน์</h1>
 <p>{SCHOOL_NAME} | ภาคเรียนที่ {SEMESTER} ปีการศึกษา {ACADEMIC_YEAR}</p></div>"""), unsafe_allow_html=True)
 
 all_data, all_subject_cols = load_all_data()
