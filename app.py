@@ -11,105 +11,88 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- ข้อมูลโรงเรียนสำหรับแบบฟอร์ม ปพ.6 ---
+SCHOOL_NAME = "โรงเรียนบ้านสันถนน"
+SCHOOL_DISTRICT = "สำนักงานเขตพื้นที่การศึกษาประถมศึกษาเชียงราย เขต 3 จังหวัดเชียงราย"
+ACADEMIC_YEAR = "2568"
+SEMESTER = "1"
+
 # --- ลิงก์ Google Sheet ---
 GSHEET_URL = "https://docs.google.com/spreadsheets/d/1FXRBsGcqjpDjKjzmArhz8SAnKd2sE-gl_zT9NhfzOPM/edit?usp=sharing"
 SHEET_ID = "1FXRBsGcqjpDjKjzmArhz8SAnKd2sE-gl_zT9NhfzOPM"
 SHEET_NAMES = ["ม.1", "ม.2", "ม.3"]
 
-# --- Custom CSS แต่งสไตล์เว็บ ---
+# --- ฟังก์ชันกำหนดประเภทและหน่วยกิตของแต่ละวิชา ---
+def get_subject_info(subj_name):
+    # กำหนดหน่วยกิตและประเภทวิชา (พื้นฐาน/เพิ่มเติม)
+    info = {
+        'ภาษาไทย': (1.5, 'พื้นฐาน'),
+        'คณิตศาสตร์': (1.5, 'พื้นฐาน'),
+        'วิทยาศาสตร์': (1.5, 'พื้นฐาน'),
+        'วิทยาการ': (1.0, 'พื้นฐาน'),
+        'สังคม': (1.5, 'พื้นฐาน'),
+        'ประวัติ': (0.5, 'พื้นฐาน'),
+        'อังกฤษ': (1.5, 'พื้นฐาน'),
+        'สุข': (1.0, 'พื้นฐาน'),
+        'พละ': (1.0, 'พื้นฐาน'),
+        'ทัศนศิลป์': (1.0, 'พื้นฐาน'),
+        'ดนตรี': (1.0, 'พื้นฐาน'),
+        'การงาน': (1.0, 'พื้นฐาน'),
+        'ออกแบบ': (1.0, 'เพิ่มเติม'),
+        'คณิตเพิ่ม': (1.0, 'เพิ่มเติม'),
+        'อังกฤษเพิ่ม': (1.0, 'เพิ่มเติม'),
+        'ทักษะอาชีพ': (0.5, 'เพิ่มเติม'),
+        'ต้านทุจริต': (0.5, 'เพิ่มเติม')
+    }
+    for key, val in info.items():
+        if key in subj_name:
+            return val
+    return (1.0, 'พื้นฐาน') # ค่าเริ่มต้นหากไม่พบรายชื่อวิชา
+
+# --- Custom CSS แต่งสไตล์เว็บ และกระดาษ ปพ.6 ---
 st.markdown("""
     <style>
-        .stMetric {
-            background-color: #f8fafc;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #3b82f6;
-        }
-        .main-header {
-            font-size: 2.2rem;
-            color: #1e3a8a;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .sub-header {
-            color: #2563eb;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-        }
-        .summary-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .summary-card h3 {
-            color: #f8fafc;
-            margin-bottom: 5px;
-        }
+        .main-header { font-size: 2.2rem; color: #1e3a8a; font-weight: 700; text-align: center; margin-bottom: 20px; }
+        .sub-header { color: #2563eb; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; }
         
-        /* สไตล์ตารางนักเรียน */
-        .student-table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-        .student-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            font-family: sans-serif;
-        }
-        .student-table th {
-            border: 1px solid #cbd5e1;
-            background-color: #f1f5f9;
-            color: #0f172a;
-            padding: 6px 2px;
-            vertical-align: bottom;
-            text-align: center;
-            font-weight: 600;
-        }
-        .student-table th.rotate-header {
-            height: 110px;
-            white-space: nowrap;
-        }
-        .student-table th.rotate-header > div {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
+        /* สไตล์หน้ากระดาษ ปพ.6 */
+        .pp6-paper {
+            background-color: white;
+            color: black;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-family: 'Sarabun', 'TH Sarabun New', Tahoma, sans-serif;
             margin: 0 auto;
-            max-height: 100px;
-            line-height: 1.1;
-            font-size: 11px;
+            max-width: 800px;
         }
-        .student-table td {
-            border: 1px solid #cbd5e1;
-            padding: 8px 4px;
-            text-align: center;
-            color: #1e293b;
-        }
-        /* ช่องสีเหลืองสำหรับงานที่ยังไม่ได้ส่ง */
-        .student-table td.missing-cell {
-            background-color: #fef08a !important;
-            color: #854d0e;
-            font-weight: bold;
-            font-size: 11px;
-        }
-        .student-table td.name-cell {
-            text-align: left;
-            white-space: nowrap;
-            font-weight: 600;
-            padding-left: 8px;
-            padding-right: 8px;
-        }
+        .pp6-header { text-align: center; margin-bottom: 20px; }
+        .pp6-header h3, .pp6-header h4 { margin: 5px 0; color: black; font-weight: bold; }
+        .pp6-header p { margin: 2px 0; font-size: 16px; color: black; }
+        .pp6-info { margin-bottom: 15px; font-size: 16px; color: black; }
+        
+        .pp6-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 16px; }
+        .pp6-table th, .pp6-table td { border: 1px solid black !important; padding: 6px 10px !important; color: black !important; }
+        .pp6-table th { background-color: #f8f9fa !important; text-align: center; font-weight: bold; }
+        
+        .pp6-summary table { width: 70%; border-collapse: collapse; font-size: 16px; margin-top: 10px; }
+        .pp6-summary td { padding: 4px; color: black !important; }
+        
+        .pp6-signatures { display: flex; justify-content: space-between; text-align: center; font-size: 16px; margin-top: 60px; color: black; }
+        
+        /* สไตล์ตาราง Dashboard */
+        .dash-table-container { width: 100%; overflow-x: auto; margin-top: 10px; margin-bottom: 20px; }
+        .dash-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .dash-table th { border: 1px solid #cbd5e1; background-color: #f1f5f9; padding: 6px 2px; text-align: center; font-weight: 600; }
+        .dash-table th.rotate-header { height: 110px; white-space: nowrap; }
+        .dash-table th.rotate-header > div { writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 auto; }
+        .dash-table td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; }
+        .dash-table td.missing-cell { background-color: #fef08a !important; color: #854d0e; font-weight: bold; font-size: 11px; }
+        .dash-table td.name-cell { text-align: left; white-space: nowrap; font-weight: 600; padding-left: 8px; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- ฟังก์ชันอ่านและคำนวณข้อมูล (GPA & ลำดับที่) ---
+# --- ฟังก์ชันอ่านและคำนวณข้อมูล ---
 def load_sheet_data(sheet_name):
     try:
         encoded_sheet = urllib.parse.quote(sheet_name)
@@ -117,7 +100,6 @@ def load_sheet_data(sheet_name):
         
         df_raw = pd.read_csv(url, header=None)
         
-        # หาตำแหน่งแถวที่เป็นหัวตาราง
         header_idx = None
         for idx, row in df_raw.iterrows():
             if row.astype(str).str.contains('ชื่อ - นามสกุล|ชื่อ-นามสกุล|ชื่อนามสกุล').any():
@@ -141,26 +123,26 @@ def load_sheet_data(sheet_name):
                 cols = [c for c in df.columns if not str(c).startswith('Unnamed') and 'merged' not in str(c).lower()]
                 df = df[cols]
                 
-                # แยกคอลัมน์วิชาเรียน (ไม่รวม เลขที่ และ ชื่อ-นามสกุล)
                 non_subj_keywords = ['เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย', 'ลำดับที่', 'รวม', 'เฉลี่ย', 'ผลการเรียน']
                 subject_cols = [c for c in df.columns if c not in ['เลขที่', 'ชื่อ - นามสกุล'] and not any(kw == c for kw in non_subj_keywords)]
                 
-                # คำนวณเกรดเฉลี่ย (GPA)
+                # คำนวณเกรดเฉลี่ยถ่วงน้ำหนัก (Weighted GPA)
                 def calc_gpa(row):
-                    grades = []
+                    total_points = 0
+                    total_credits = 0
                     for col in subject_cols:
                         val = row[col]
+                        credit, _ = get_subject_info(col)
                         try:
                             v_float = float(val)
                             if not np.isnan(v_float):
-                                grades.append(v_float)
+                                total_points += v_float * credit
+                                total_credits += credit
                         except (ValueError, TypeError):
                             pass
-                    return round(np.mean(grades), 2) if len(grades) > 0 else np.nan
+                    return round(total_points / total_credits, 2) if total_credits > 0 else np.nan
 
                 df['เกรดเฉลี่ย'] = df.apply(calc_gpa, axis=1)
-                
-                # จัดลำดับที่ในห้องเรียน
                 df['ลำดับที่'] = df['เกรดเฉลี่ย'].rank(ascending=False, method='min').astype('Int64')
                 
                 return df, subject_cols
@@ -171,8 +153,7 @@ def load_sheet_data(sheet_name):
         return pd.DataFrame(), []
 
 def load_all_data():
-    all_data = {}
-    all_subject_cols = {}
+    all_data, all_subject_cols = {}, {}
     for sheet in SHEET_NAMES:
         df, subjs = load_sheet_data(sheet)
         if not df.empty:
@@ -180,12 +161,112 @@ def load_all_data():
             all_subject_cols[sheet] = subjs
     return all_data, all_subject_cols
 
-# --- ฟังก์ชันสร้างตาราง HTML สไตล์พิเศษสำหรับนักเรียน ---
-def render_student_table_html(df, subject_cols):
-    html = '<div class="student-table-container"><table class="student-table"><thead><tr>'
-    normal_cols = ['เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย', 'ลำดับที่', 'ผลการเรียน']
+# --- สร้างหน้ากระดาษ ปพ.6 ---
+def render_porpor6(row, sheet_name, subject_cols, total_students):
+    student_no = int(row['เลขที่']) if pd.notna(row['เลขที่']) else "-"
+    student_name = row['ชื่อ - นามสกุล']
+    rank = row['ลำดับที่']
+    gpa = f"{row['เกรดเฉลี่ย']:.2f}" if pd.notna(row['เกรดเฉลี่ย']) else "-"
     
-    # แสดงคอลัมน์ข้อมูลหลัก และคอลัมน์วิชาเรียน
+    total_basic_cr = 0.0
+    total_add_cr = 0.0
+    
+    tbody_html = ""
+    for i, col in enumerate(subject_cols, 1):
+        credit, subj_type = get_subject_info(col)
+        
+        if subj_type == 'พื้นฐาน':
+            total_basic_cr += credit
+        else:
+            total_add_cr += credit
+            
+        val = row[col]
+        is_missing = pd.isna(val) or val is None or str(val).strip() == '' or str(val).strip().lower() in ['nan', 'none']
+        if is_missing:
+            grade_str = 'ยังไม่ส่ง'
+        else:
+            grade_str = f"{val:.1f}".rstrip('0').rstrip('.') if isinstance(val, float) and val % 1 != 0 else str(int(val)) if isinstance(val, float) else str(val)
+            
+        tbody_html += f'''
+        <tr>
+            <td style="text-align: center;">{i}</td>
+            <td style="text-align: left;">{col}</td>
+            <td style="text-align: center;">{subj_type}</td>
+            <td style="text-align: center;">{credit:.1f}</td>
+            <td style="text-align: center;">{grade_str}</td>
+        </tr>
+        '''
+        
+    total_cr = total_basic_cr + total_add_cr
+
+    html = f'''
+    <div class="pp6-paper">
+        <div class="pp6-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Emblem_of_the_Ministry_of_Education_of_Thailand.svg/200px-Emblem_of_the_Ministry_of_Education_of_Thailand.svg.png" width="60" style="margin-bottom:10px; opacity:0.8;">
+            <h3>แบบรายงานผลพัฒนาคุณภาพผู้เรียนรายบุคคล</h3>
+            <p>ปีการศึกษา {ACADEMIC_YEAR} ภาคเรียนที่ {SEMESTER}</p>
+            <h4>{SCHOOL_NAME}</h4>
+            <p>{SCHOOL_DISTRICT}</p>
+        </div>
+        
+        <div class="pp6-info">
+            <b>เลขที่:</b> {student_no} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชื่อ - นามสกุล:</b> {student_name} &nbsp;&nbsp;&nbsp;&nbsp; <b>ชั้น:</b> {sheet_name}
+        </div>
+        
+        <table class="pp6-table">
+            <thead>
+                <tr>
+                    <th width="8%">ลำดับ</th>
+                    <th width="42%">ชื่อวิชา</th>
+                    <th width="20%">ประเภท</th>
+                    <th width="15%">จำนวน<br>หน่วยกิต</th>
+                    <th width="15%">ระดับ<br>ผลการเรียน</th>
+                </tr>
+            </thead>
+            <tbody>
+                {tbody_html}
+            </tbody>
+        </table>
+        
+        <div class="pp6-summary">
+            <b>สรุปผลการประเมิน</b>
+            <table>
+                <tr>
+                    <td>จำนวนหน่วยกิต/น้ำหนักวิชาพื้นฐาน</td>
+                    <td>{total_basic_cr:.1f}</td>
+                </tr>
+                <tr>
+                    <td>จำนวนหน่วยกิต/น้ำหนักวิชาเพิ่มเติม</td>
+                    <td>{total_add_cr:.1f}</td>
+                </tr>
+                <tr>
+                    <td><b>รวมจำนวนหน่วยกิต/น้ำหนัก</b></td>
+                    <td><b>{total_cr:.1f}</b></td>
+                </tr>
+                <tr>
+                    <td><b>ระดับผลการเรียนเฉลี่ย (GPA)</b></td>
+                    <td><b>{gpa}</b></td>
+                </tr>
+                <tr>
+                    <td><b>อันดับที่ในห้องเรียน</b></td>
+                    <td><b>{rank} จากนักเรียนจำนวน {total_students} คน</b></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="pp6-signatures">
+            <div>ลงชื่อ................................................<br><br>ครูที่ปรึกษา</div>
+            <div>ลงชื่อ................................................<br><br>ผู้บริหารสถานศึกษา</div>
+            <div>ลงชื่อ................................................<br><br>ผู้ปกครอง</div>
+        </div>
+    </div>
+    '''
+    return html
+
+# --- สร้างตาราง Dashboard ---
+def render_dashboard_table(df, subject_cols):
+    html = '<div class="dash-table-container"><table class="dash-table"><thead><tr>'
+    normal_cols = ['เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย', 'ลำดับที่']
     display_cols = [c for c in df.columns if c in normal_cols or c in subject_cols]
     
     for col in display_cols:
@@ -195,15 +276,12 @@ def render_student_table_html(df, subject_cols):
             html += f'<th class="rotate-header"><div>{col}</div></th>'
             
     html += '</tr></thead><tbody>'
-    non_score_cols = ['เลขที่', 'ชื่อ - นามสกุล', 'ลำดับที่']
-    
     for _, row in df.iterrows():
         html += '<tr>'
         for col in display_cols:
             val = row[col]
             is_missing = pd.isna(val) or val is None or str(val).strip() == '' or str(val).strip().lower() in ['nan', 'none']
-            
-            if col in non_score_cols:
+            if col in ['เลขที่', 'ชื่อ - นามสกุล', 'ลำดับที่']:
                 if col == 'ชื่อ - นามสกุล':
                     html += f'<td class="name-cell">{val if not is_missing else ""}</td>'
                 else:
@@ -212,13 +290,8 @@ def render_student_table_html(df, subject_cols):
                 if is_missing:
                     html += '<td class="missing-cell">ยังไม่ส่ง</td>'
                 else:
-                    if isinstance(val, float):
-                        formatted_val = f"{val:.2f}".rstrip('0').rstrip('.') if val % 1 != 0 else f"{int(val)}"
-                    else:
-                        formatted_val = str(val)
-                    html += f'<td>{formatted_val}</td>'
+                    html += f'<td>{f"{val:.2f}".rstrip("0").rstrip(".") if isinstance(val, float) and val % 1 != 0 else (int(val) if isinstance(val, float) else val)}</td>'
         html += '</tr>'
-        
     html += '</tbody></table></div>'
     return html
 
@@ -235,22 +308,19 @@ with st.sidebar:
         "📊 แดชบอร์ดสรุปภาพรวม", 
         "📝 สำหรับครู (จัดการคะแนน)"
     ])
-    st.markdown("---")
-    st.caption("📱 รองรับการใช้งานผ่านมือถือและคอมพิวเตอร์")
 
 all_data, all_subject_cols = load_all_data()
 
 # ==========================================
-# 1. หน้า สำหรับนักเรียน (ค้นหาคะแนน)
+# 1. หน้า สำหรับนักเรียน (รูปแบบ ปพ.6)
 # ==========================================
 if menu == "🔍 สำหรับนักเรียน (ค้นหาคะแนน)":
     st.markdown('<h2 class="sub-header">🔍 ค้นหาผลการเรียน</h2>', unsafe_allow_html=True)
     
-    search_name = st.text_input("พิมพ์ชื่อ หรือนามสกุล ของนักเรียน (เช่น สมชาย หรือ พชร)", placeholder="กรอกชื่อเพื่อค้นหา...").strip()
+    search_name = st.text_input("พิมพ์ชื่อ หรือนามสกุล ของนักเรียน (เช่น สมชาย)", placeholder="กรอกชื่อเพื่อค้นหา...").strip()
     
     if search_name:
         found = False
-        
         for sheet_name, df in all_data.items():
             if 'ชื่อ - นามสกุล' in df.columns:
                 student_data = df[df['ชื่อ - นามสกุล'].astype(str).str.contains(search_name, na=False, case=False)]
@@ -260,110 +330,49 @@ if menu == "🔍 สำหรับนักเรียน (ค้นหาค�
                     total_students = len(df)
                     
                     for _, student in student_data.iterrows():
-                        st.markdown(f"""
-                        <div class="summary-card">
-                            <h3>👤 {student['ชื่อ - นามสกุล']} (ระดับชั้น {sheet_name})</h3>
-                            <p style="margin: 0; font-size: 1.1rem;">
-                                🏆 <b>เกรดเฉลี่ย (GPA):</b> <span style="font-size: 1.4rem; color: #fde047;"><b>{student['เกรดเฉลี่ย']:.2f}</b></span> &nbsp;|&nbsp; 
-                                📊 <b>อันดับที่ในห้องเรียน:</b> <span style="font-size: 1.3rem;"><b>{student['ลำดับที่']}</b></span> / {total_students} คน &nbsp;|&nbsp; 
-                                📚 <b>วิชาที่เรียน:</b> {len(subj_cols)} วิชา
-                            </p>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        with st.expander(f"📖 ดูรายละเอียดคะแนนรายวิชาของ {student['ชื่อ - นามสกุล']}", expanded=True):
-                            st.markdown(render_student_table_html(student_data, subj_cols), unsafe_allow_html=True)
+                        st.markdown(render_porpor6(student, sheet_name, subj_cols, total_students), unsafe_allow_html=True)
+                        st.markdown("<br><hr><br>", unsafe_allow_html=True)
                         
         if not found:
             st.warning("⚠️ ไม่พบรายชื่อนี้ในระบบ กรุณาตรวจสอบการสะกดคำอีกครั้ง")
 
 # ==========================================
-# 2. หน้า แดชบอร์ดสรุปภาพรวม
+# 2. หน้า แดชบอร์ดภาพรวม
 # ==========================================
 elif menu == "📊 แดชบอร์ดสรุปภาพรวม":
     st.markdown('<h2 class="sub-header">📊 แดชบอร์ดสรุปผลการเรียน</h2>', unsafe_allow_html=True)
     
-    # --- ส่วนที่ 1: สรุป Top 5 เกรดเฉลี่ยสูงสุดของแต่ละชั้นเรียน ---
-    st.markdown("### 🏆 นักเรียนที่ได้เกรดเฉลี่ยสูงสุด 5 อันดับแรก (แต่ละชั้นเรียน)")
-    
+    st.markdown("### 🏆 นักเรียนที่ได้เกรดเฉลี่ยสูงสุด 5 อันดับแรก")
     tabs = st.tabs([f"ระดับชั้น {sheet}" for sheet in SHEET_NAMES])
-    
     for i, sheet in enumerate(SHEET_NAMES):
         with tabs[i]:
             if sheet in all_data:
                 df = all_data[sheet]
                 top5_df = df.sort_values('เกรดเฉลี่ย', ascending=False).head(5)
-                
                 display_top5 = top5_df[['ลำดับที่', 'เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย']].copy()
                 display_top5.columns = ['อันดับในห้อง', 'เลขที่', 'ชื่อ - นามสกุล', 'เกรดเฉลี่ย (GPA)']
-                
-                st.dataframe(
-                    display_top5,
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config={
-                        "เกรดเฉลี่ย (GPA)": st.column_config.ProgressColumn(
-                            "เกรดเฉลี่ย (GPA)",
-                            format="%.2f",
-                            min_value=0.0,
-                            max_value=4.0
-                        )
-                    }
-                )
-            else:
-                st.info("ไม่มีข้อมูลในชั้นเรียนนี้")
+                st.dataframe(display_top5, use_container_width=True, hide_index=True)
                 
     st.markdown("---")
-    
-    # --- ส่วนที่ 2: กราฟสรุปจำนวนเกรดของแต่ละวิชา ในแต่ละชั้น ---
-    st.markdown("### 📈 กราฟแสดงรายละเอียดจำนวนเกรดของแต่ละวิชา")
-    
-    selected_level = st.selectbox("📌 เลือกระดับชั้นเรียน:", SHEET_NAMES)
-    
-    if selected_level in all_data:
-        df_level = all_data[selected_level]
-        subj_cols = all_subject_cols.get(selected_level, [])
-        
-        # ตัวเลือกรายวิชา (รวมตัวเลือก "ทุกวิชารวมกัน")
-        selected_subject = st.selectbox("📚 เลือกวิชาที่ต้องการดูการแจกแจงเกรด:", ["ทุกวิชารวมกัน"] + subj_cols)
-        
-        # แปลงข้อมูลเป็นตารางคู่ (วิชา - เกรด)
-        melted = df_level.melt(id_vars=['ชื่อ - นามสกุล'], value_vars=subj_cols, var_name='วิชา', value_name='เกรด')
-        melted['เกรด'] = melted['เกรด'].apply(lambda x: 'ยังไม่ส่ง' if pd.isna(x) or str(x).strip() == '' or str(x).strip().lower() in ['nan', 'none'] else str(x))
-        
-        if selected_subject != "ทุกวิชารวมกัน":
-            filtered_melted = melted[melted['วิชา'] == selected_subject]
-        else:
-            filtered_melted = melted
-            
-        grade_counts = filtered_melted['เกรด'].value_counts().reset_index()
-        grade_counts.columns = ['ระดับเกรด', 'จำนวนนักเรียน (คน)']
-        
-        # แสดงกราฟแท่ง
-        st.markdown(f"#### 📊 จำนวนนักเรียนในแต่ละระดับเกรด ({selected_subject} - ชั้น {selected_level})")
-        st.bar_chart(grade_counts.set_index('ระดับเกรด'))
-        
-        # ตารางสรุปจำนวนเกรดแยกตามวิชา
-        with st.expander("📋 ดูตารางสรุปจำนวนเกรดแยกตามรายวิชาทั้งหมด"):
-            pivot_grade = melted.groupby(['วิชา', 'เกรด']).size().unstack(fill_value=0)
-            st.dataframe(pivot_grade, use_container_width=True)
+    st.markdown("### 📋 ข้อมูลเกรดเฉลี่ยทั้งระดับชั้น")
+    selected_dash_sheet = st.selectbox("เลือกชั้นเรียนที่ต้องการดูรายละเอียด:", SHEET_NAMES)
+    if selected_dash_sheet in all_data:
+        df = all_data[selected_dash_sheet]
+        subj_cols = all_subject_cols.get(selected_dash_sheet, [])
+        st.markdown(render_dashboard_table(df, subj_cols), unsafe_allow_html=True)
 
 # ==========================================
-# 3. หน้า สำหรับครู (จัดการคะแนน)
+# 3. หน้า สำหรับครู
 # ==========================================
 elif menu == "📝 สำหรับครู (จัดการคะแนน)":
     st.markdown('<h2 class="sub-header">📝 ระบบจัดการคะแนน</h2>', unsafe_allow_html=True)
-    
     password = st.text_input("🔑 รหัสผ่านสำหรับคุณครู", type="password")
     
     if password == "1234":
         st.success("🔓 ยืนยันตัวตนสำเร็จ")
-        st.info("💡 คุณครูสามารถเข้าไปแก้ไขคะแนนโดยตรงได้ที่ Google Sheets ลิงก์ด้านล่าง ระบบจะอัปเดตคำนวณเกรดเฉลี่ยบนเว็บโดยอัตโนมัติทันที:")
         st.markdown(f"👉 **[คลิกที่นี่เพื่อเปิด Google Sheet แก้ไขคะแนน]({GSHEET_URL})**")
-        
         selected_sheet = st.selectbox("📌 เลือกดูตารางคะแนนล่าสุด", SHEET_NAMES)
         if selected_sheet in all_data:
             st.dataframe(all_data[selected_sheet], use_container_width=True, hide_index=True)
-            
     elif password != "":
         st.error("❌ รหัสผ่านไม่ถูกต้อง!")
