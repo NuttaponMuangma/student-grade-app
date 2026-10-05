@@ -24,7 +24,7 @@ GSHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit?usp=sharin
 SHEET_NAMES = ["ม.1", "ม.2", "ม.3"]
 
 # รหัสครู: ตั้งใน Streamlit Cloud > Settings > Secrets  ->  TEACHER_PASSWORD = "รหัสของท่าน"
-TEACHER_PASSWORD = st.secrets.get("TEACHER_PASSWORD", "1234")
+TEACHER_PASSWORD = st.secrets.get("TEACHER_PASSWORD", "57030121")
 
 
 def clean_html(s):
