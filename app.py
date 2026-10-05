@@ -24,7 +24,7 @@ GSHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit?usp=sharin
 SHEET_NAMES = ["ม.1", "ม.2", "ม.3"]
 
 # รหัสครู: ตั้งใน Streamlit Cloud > Settings > Secrets  ->  TEACHER_PASSWORD = "รหัสของท่าน"
-TEACHER_PASSWORD = st.secrets.get("TEACHER_PASSWORD", "57030121")
+TEACHER_PASSWORD = st.secrets.get("TEACHER_PASSWORD", "1234")
 
 
 def clean_html(s):
@@ -179,22 +179,10 @@ html,body,[class*="css"],.stMarkdown,.stTextInput,.stTabs{font-family:'Sarabun',
 st.markdown(clean_html(CSS), unsafe_allow_html=True)
 
 
-BG_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6FC3FF"/><stop offset="1" stop-color="#EAF7FF"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="#FFE98A" stop-opacity=".9"/><stop offset="1" stop-color="#FFE98A" stop-opacity="0"/></radialGradient><g id="cloud"><ellipse cx="0" cy="0" rx="90" ry="32"/><circle cx="-35" cy="-22" r="34"/><circle cx="20" cy="-34" r="42"/><circle cx="62" cy="-10" r="26"/></g></defs><rect width="1600" height="900" fill="url(#sky)"/><circle cx="1330" cy="140" r="150" fill="url(#glow)"/><circle cx="1330" cy="140" r="68" fill="#FFD54A"/><g fill="#fff" opacity=".95"><use href="#cloud" x="300" y="150"/><use href="#cloud" x="780" y="95" transform="translate(0 0)"/><use href="#cloud" x="1060" y="250"/><use href="#cloud" x="1500" y="360" transform="translate(0 0)"/></g><g fill="none" stroke="#35538F" stroke-width="4" stroke-linecap="round"><path d="M640 220q14-16 28 0q14-16 28 0"/><path d="M700 260q10-12 20 0q10-12 20 0"/><path d="M1130 120q12-14 24 0q12-14 24 0"/></g><path d="M0 610Q300 470 620 580T1200 550T1600 530V900H0Z" fill="#B4EBC0"/><path d="M0 690Q420 560 820 660T1600 640V900H0Z" fill="#86DC9E"/><rect y="745" width="1600" height="155" fill="#5CC97B"/><path d="M0 790Q400 765 800 790T1600 780V900H0Z" fill="#4DBB6D"/><path d="M262 745H338L580 900H100Z" fill="#F6E7BE"/><g><rect x="60" y="620" width="90" height="125" fill="#FFD98A"/><rect x="450" y="620" width="90" height="125" fill="#FFD98A"/><rect x="130" y="560" width="340" height="185" fill="#FFE9A8"/><polygon points="105,562 300,468 495,562" fill="#FF7A59"/><polygon points="40,622 105,576 170,622" fill="#F2674F"/><polygon points="430,622 495,576 560,622" fill="#F2674F"/><circle cx="300" cy="528" r="24" fill="#fff" stroke="#FFB703" stroke-width="6"/><path d="M300 528V512M300 528L312 534" stroke="#35538F" stroke-width="4" stroke-linecap="round"/><g fill="#9AD8FF" stroke="#fff" stroke-width="4"><rect x="150" y="598" width="42" height="52" rx="6"/><rect x="212" y="598" width="42" height="52" rx="6"/><rect x="346" y="598" width="42" height="52" rx="6"/><rect x="408" y="598" width="42" height="52" rx="6"/><rect x="79" y="655" width="42" height="48" rx="6"/><rect x="479" y="655" width="42" height="48" rx="6"/></g><g stroke="#fff" stroke-width="3"><path d="M171 598V650M150 624H192M233 598V650M212 624H254M367 598V650M346 624H388M429 598V650M408 624H450"/></g><rect x="272" y="640" width="56" height="105" rx="8" fill="#4C8DF6"/><path d="M300 640V745" stroke="#fff" stroke-width="3"/><circle cx="292" cy="696" r="3.5" fill="#fff"/><circle cx="308" cy="696" r="3.5" fill="#fff"/><rect x="258" y="732" width="84" height="13" rx="4" fill="#E8D5A2"/></g><g><line x1="590" y1="470" x2="590" y2="745" stroke="#9AA7B8" stroke-width="6" stroke-linecap="round"/><circle cx="590" cy="466" r="7" fill="#F5B72E"/><rect x="596" y="480" width="86" height="6" fill="#E5384B"/><rect x="596" y="486" width="86" height="6" fill="#fff"/><rect x="596" y="492" width="86" height="12" fill="#2B4C9B"/><rect x="596" y="504" width="86" height="6" fill="#fff"/><rect x="596" y="510" width="86" height="6" fill="#E5384B"/></g><g><rect x="880" y="665" width="215" height="78" rx="20" fill="#FFC83D"/><rect x="880" y="722" width="215" height="9" fill="#F59E0B"/><g fill="#BDE8FF"><rect x="897" y="681" width="34" height="30" rx="6"/><rect x="940" y="681" width="34" height="30" rx="6"/><rect x="983" y="681" width="34" height="30" rx="6"/><rect x="1050" y="681" width="32" height="38" rx="6"/></g><g fill="#35405A"><circle cx="940" cy="744" r="19"/><circle cx="1042" cy="744" r="19"/></g><g fill="#CBD5E1"><circle cx="940" cy="744" r="7"/><circle cx="1042" cy="744" r="7"/></g></g><g><rect x="1233" y="555" width="34" height="195" rx="8" fill="#A9714B"/><g fill="#3FB56B"><circle cx="1250" cy="515" r="92"/><circle cx="1182" cy="572" r="62"/><circle cx="1320" cy="572" r="66"/><circle cx="1250" cy="450" r="60"/></g><g fill="#5BD184" opacity=".7"><circle cx="1225" cy="490" r="34"/><circle cx="1290" cy="540" r="26"/><circle cx="1175" cy="560" r="22"/></g><rect x="1470" y="640" width="18" height="110" rx="6" fill="#A9714B"/><g fill="#3FB56B"><circle cx="1479" cy="615" r="52"/><circle cx="1438" cy="650" r="36"/><circle cx="1520" cy="650" r="38"/></g><g fill="#3FB56B"><ellipse cx="700" cy="748" rx="55" ry="30"/><ellipse cx="750" cy="755" rx="40" ry="22"/><ellipse cx="30" cy="750" rx="60" ry="32"/></g><g fill="#5BD184" opacity=".7"><ellipse cx="690" cy="740" rx="26" ry="14"/><ellipse cx="20" cy="742" rx="28" ry="15"/></g></g><g><g fill="#FF8FB1"><circle cx="420" cy="815"  r="7"/><circle cx="780" cy="830" r="7"/><circle cx="1180" cy="820" r="7"/><circle cx="1400" cy="845" r="7"/></g><g fill="#fff"><circle cx="460" cy="835" r="6"/><circle cx="860" cy="815" r="6"/><circle cx="1120" cy="850" r="6"/><circle cx="1540" cy="830" r="6"/></g></g></svg>"""
-
-
-def bg_css():
-    import base64
-    data = base64.b64encode(BG_SVG.encode("utf-8")).decode()
-    return (
-        "<style>.stApp{background-color:#EAF7FF !important;"
-        f"background-image:url(data:image/svg+xml;base64,{data}) !important;"
-        "background-size:cover !important;background-position:center bottom !important;"
-        "background-repeat:no-repeat !important;background-attachment:fixed !important;}"
-        "@media (max-width:700px){.stApp{background-position:18% bottom !important;}}</style>"
-    )
-
-
-st.markdown(bg_css(), unsafe_allow_html=True)
+st.markdown(
+    "<style>.stApp{background:linear-gradient(160deg,#CDE8FF 0%,#EAF4FF 45%,#FFFFFF 100%) !important;"
+    "background-attachment:fixed !important;}</style>",
+    unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------- ข้อมูล
